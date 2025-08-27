@@ -1,0 +1,135 @@
+[
+  {
+    "id": "honda-45022-tba-a00",
+    "title": "Pastilha de Freio Dianteira",
+    "brand": "Honda",
+    "oem": "45022-TBA-A00",
+    "manufacturer": "Nissin",
+    "system": "Freio",
+    "fit": [
+      {
+        "make": "Honda",
+        "model": "Civic",
+        "years": [
+          2014,
+          2015,
+          2016
+        ],
+        "engine": "2.0"
+      }
+    ],
+    "url": "produto/45022-TBA-A00.html",
+    "price": 249.9
+  },
+  {
+    "id": "honda-17220-r1a-a01",
+    "title": "Filtro de Ar do Motor",
+    "brand": "Honda",
+    "oem": "17220-R1A-A01",
+    "manufacturer": "Mahle",
+    "system": "Motor",
+    "fit": [
+      {
+        "make": "Honda",
+        "model": "Fit",
+        "years": [
+          2012,
+          2013,
+          2014
+        ],
+        "engine": "1.5"
+      }
+    ],
+    "url": "produto/17220-R1A-A01.html",
+    "price": 89.9
+  },
+  {
+    "id": "ford-1780111",
+    "title": "Amortecedor Traseiro",
+    "brand": "Ford",
+    "oem": "1780111",
+    "manufacturer": "Motorcraft",
+    "system": "Suspensão",
+    "fit": [
+      {
+        "make": "Ford",
+        "model": "Ka",
+        "years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "engine": "1.0"
+      }
+    ],
+    "url": "produto/1780111.html",
+    "price": 199.9
+  },
+  {
+    "id": "ford-1716054",
+    "title": "Filtro de Óleo",
+    "brand": "Ford",
+    "oem": "1716054",
+    "manufacturer": "Fram",
+    "system": "Motor",
+    "fit": [
+      {
+        "make": "Ford",
+        "model": "Focus",
+        "years": [
+          2012,
+          2013,
+          2014
+        ],
+        "engine": "2.0"
+      }
+    ],
+    "url": "produto/1716054.html",
+    "price": 45.0
+  },
+  {
+    "id": "gm-13331506",
+    "title": "Filtro de Ar do Motor",
+    "brand": "Chevrolet",
+    "oem": "13331506",
+    "manufacturer": "ACDelco",
+    "system": "Motor",
+    "fit": [
+      {
+        "make": "Chevrolet",
+        "model": "Onix",
+        "years": [
+          2019,
+          2020,
+          2021
+        ],
+        "engine": "1.0"
+      }
+    ],
+    "url": "produto/13331506.html",
+    "price": 59.9
+  },
+  {
+    "id": "gm-93186324",
+    "title": "Pastilha de Freio Dianteira",
+    "brand": "Chevrolet",
+    "oem": "93186324",
+    "manufacturer": "Cobreq",
+    "system": "Freio",
+    "fit": [
+      {
+        "make": "Chevrolet",
+        "model": "Cobalt",
+        "years": [
+          2015,
+          2016,
+          2017
+        ],
+        "engine": "1.8"
+      }
+    ],
+    "url": "produto/93186324.html",
+    "price": 189.9
+  }
+]
