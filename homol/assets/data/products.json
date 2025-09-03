@@ -1,0 +1,23 @@
+[
+  {
+    "id": "p1",
+    "title": "Vistoria Express",
+    "price": 99.9,
+    "img": "/produtos/prod1.jpg",
+    "url": "/loja?sku=p1"
+  },
+  {
+    "id": "p2",
+    "title": "Laudo Completo",
+    "price": 149.9,
+    "img": "/produtos/prod2.jpg",
+    "url": "/loja?sku=p2"
+  },
+  {
+    "id": "p3",
+    "title": "Assessoria Premium",
+    "price": 199.9,
+    "img": "/produtos/prod3.jpg",
+    "url": "/loja?sku=p3"
+  }
+]
