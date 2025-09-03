@@ -163,7 +163,7 @@ section.brands{padding:24px 0}
 
   
 /* ===== Slider (banners) ===== */
-.slider{position:relative;margin-top:8px}
+.slider{position:relative;margin-top:12px}
 .slider__viewport{position:relative;overflow:hidden;border-radius:12px;background:#0a0a0a}
 .slider__track{display:flex;transition:transform 420ms ease;will-change:transform}
 .slide{min-width:100%;aspect-ratio:16/9;display:grid;place-items:center;background:#0a0a0a}
@@ -176,14 +176,32 @@ section.brands{padding:24px 0}
 .nav-btn:hover{background:rgba(12,30,38,.9)}
 .nav-prev{left:10px}.nav-next{right:10px}
 
-  
+
 /* ===== Cookie banner ===== */
 .cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;padding:12px 14px;background:var(--chip-bg,#fff);color:var(--chip-fg,#0c1e26);border:1px solid var(--border,#eef2f4);border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.18);display:none;z-index:9999}
 .cookie-banner.show{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .cookie-banner .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border,#eef2f4);background:transparent;color:inherit;padding:8px 12px;border-radius:10px;cursor:pointer}
 .cookie-banner .btn.primary{background:var(--brand,#679fad);border-color:var(--brand,#679fad);color:#fff}
 
-  </style>
+
+/* ===== Visitors banner ===== */
+.visitors-banner{
+  position:fixed; left:16px; bottom:82px; /* acima do WhatsApp / cookie */
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; background:#0c1e26; color:#fff;
+  border-radius:999px; box-shadow:0 8px 22px rgba(0,0,0,.18); z-index:1100;
+  font-size:14px;
+}
+.visitors-banner .dot{width:8px;height:8px;border-radius:50%;background:#2ecc71; box-shadow:0 0 0 0 rgba(46,204,113,.7); animation:ping 2s infinite}
+@keyframes ping{ 0%{box-shadow:0 0 0 0 rgba(46,204,113,.7)} 70%{box-shadow:0 0 0 10px rgba(46,204,113,0)} 100%{box-shadow:0 0 0 0 rgba(46,204,113,0)} }
+@media (max-width:640px){
+  .visitors-banner{ left:12px; bottom:76px; font-size:13px; padding:7px 10px }
+}
+@media (prefers-reduced-motion: reduce){
+  .visitors-banner .dot{ animation:none; }
+}
+
+</style>
 
   <!-- JSON-LD simples para SEO local (ajuste os dados reais) -->
   <script type="application/ld+json">
@@ -197,7 +215,96 @@ section.brands{padding:24px 0}
     "description": "Assessoria e comércio eletrônico – Vistorias ágeis e atendimento humano.",
     "address": {"@type": "PostalAddress","addressCountry": "BR"}
   }
-  </script>
+  
+// ===== Slider (banners) =====
+(function(){
+  const viewport = document.getElementById('viewport');
+  const track = document.getElementById('track');
+  const dots = document.getElementById('dots');
+  if(!viewport || !track || !dots) return;
+  const slides = Array.from(track.children);
+  let index = 0, timer = null;
+  slides.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='dot'; b.setAttribute('aria-label','Ir para slide '+(i+1));
+    b.addEventListener('click',()=>go(i)); dots.appendChild(b);
+  });
+  function update(){ track.style.transform=`translateX(-${index*100}%)`; [...dots.children].forEach((d,i)=>d.setAttribute('aria-current',i===index)); }
+  function go(i){ index=(i+slides.length)%slides.length; update(); reset(); }
+  function next(){ go(index+1); } function prev(){ go(index-1); }
+  document.getElementById('next')?.addEventListener('click',next);
+  document.getElementById('prev')?.addEventListener('click',prev);
+  let startX=0,dx=0; viewport.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;dx=0;},{passive:true});
+  viewport.addEventListener('touchmove',e=>{dx=e.touches[0].clientX-startX;},{passive:true});
+  viewport.addEventListener('touchend',()=>{if(Math.abs(dx)>50){dx<0?next():prev();}});
+  function reset(){ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; clearInterval(timer); timer=setInterval(next,5000); }
+  window.addEventListener('load',()=>{update();reset();});
+})();
+
+// ===== Cookie banner =====
+(function(){
+  const banner=document.getElementById('cookieBanner');
+  if(!banner) return;
+  const accepted=localStorage.getItem('cookie_consent')==='true';
+  if(!accepted){ banner.classList.add('show'); }
+  document.getElementById('cookieAccept')?.addEventListener('click',()=>{
+    localStorage.setItem('cookie_consent','true'); banner.classList.remove('show');
+  });
+  document.getElementById('cookieDecline')?.addEventListener('click',()=>{ banner.classList.remove('show'); });
+})();
+
+// ===== Brands carousel: autoplay + A11y =====
+(function(){
+  const track = document.getElementById('brandTrack');
+  const prev = document.getElementById('brandPrev');
+  const next = document.getElementById('brandNext');
+  if(!track || !prev || !next) return;
+  const step = 220; // px
+  let timer = null;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function scrollStep(dir=1){
+    track.scrollBy({left: dir*step, behavior: prefersReduced ? 'auto' : 'smooth'});
+    if(track.scrollLeft + track.clientWidth + 4 >= track.scrollWidth){ track.scrollTo({left: 0, behavior: 'auto'}); }
+    if(track.scrollLeft <= 0 && dir < 0){ track.scrollTo({left: track.scrollWidth - track.clientWidth, behavior: 'auto'}); }
+  }
+  prev.addEventListener('click', ()=>scrollStep(-1));
+  next.addEventListener('click', ()=>scrollStep(1));
+  track.addEventListener('keydown', (e)=>{ if(e.key==='ArrowRight'){e.preventDefault();scrollStep(1);} if(e.key==='ArrowLeft'){e.preventDefault();scrollStep(-1);} });
+  function start(){ if(prefersReduced) return; clearInterval(timer); timer=setInterval(()=>scrollStep(1), 3000); }
+  function stop(){ clearInterval(timer); }
+  ['mouseenter','focusin','touchstart'].forEach(ev=>track.addEventListener(ev, stop, {passive:true}));
+  ['mouseleave','focusout','touchend'].forEach(ev=>track.addEventListener(ev, start, {passive:true}));
+  ['mouseenter','focusin','touchstart'].forEach(ev=>prev.addEventListener(ev, stop, {passive:true}));
+  ['mouseleave','focusout','touchend'].forEach(ev=>prev.addEventListener(ev, start, {passive:true}));
+  ['mouseenter','focusin','touchstart'].forEach(ev=>next.addEventListener(ev, stop, {passive:true}));
+  ['mouseleave','focusout','touchend'].forEach(ev=>next.addEventListener(ev, start, {passive:true}));
+  start();
+})();
+
+// ===== Visitors banner (oscillating 80–230) =====
+(function(){
+  const el = document.getElementById('visitorsText');
+  if(!el) return;
+  // deterministic seed per session to look stable on refreshes
+  let n = Number(sessionStorage.getItem('visitors_seed'));
+  if(!n || isNaN(n)) { n = 80 + Math.floor(Math.random()*151); sessionStorage.setItem('visitors_seed', String(n)); }
+  n = Math.min(230, Math.max(80, n));
+  function render(){ el.textContent = `👥 ${n} visitantes online agora`; }
+  function tick(){
+    // random walk: -6..+8 users; clamp to [80,230]
+    const delta = Math.floor(Math.random()*15) - 6;
+    n = Math.min(230, Math.max(80, n + delta));
+    render();
+    // vary interval 8–15s
+    const next = 8000 + Math.floor(Math.random()*7000);
+    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      setTimeout(tick, next);
+    }
+  }
+  render();
+  setTimeout(tick, 9000);
+})();
+</script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -632,7 +739,96 @@ document.querySelectorAll('.cat-item.has-mega .cat-btn').forEach(btn => {
     `).join('');
   }catch(e){}
 })();
-  </script>
+  
+// ===== Slider (banners) =====
+(function(){
+  const viewport = document.getElementById('viewport');
+  const track = document.getElementById('track');
+  const dots = document.getElementById('dots');
+  if(!viewport || !track || !dots) return;
+  const slides = Array.from(track.children);
+  let index = 0, timer = null;
+  slides.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='dot'; b.setAttribute('aria-label','Ir para slide '+(i+1));
+    b.addEventListener('click',()=>go(i)); dots.appendChild(b);
+  });
+  function update(){ track.style.transform=`translateX(-${index*100}%)`; [...dots.children].forEach((d,i)=>d.setAttribute('aria-current',i===index)); }
+  function go(i){ index=(i+slides.length)%slides.length; update(); reset(); }
+  function next(){ go(index+1); } function prev(){ go(index-1); }
+  document.getElementById('next')?.addEventListener('click',next);
+  document.getElementById('prev')?.addEventListener('click',prev);
+  let startX=0,dx=0; viewport.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;dx=0;},{passive:true});
+  viewport.addEventListener('touchmove',e=>{dx=e.touches[0].clientX-startX;},{passive:true});
+  viewport.addEventListener('touchend',()=>{if(Math.abs(dx)>50){dx<0?next():prev();}});
+  function reset(){ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; clearInterval(timer); timer=setInterval(next,5000); }
+  window.addEventListener('load',()=>{update();reset();});
+})();
+
+// ===== Cookie banner =====
+(function(){
+  const banner=document.getElementById('cookieBanner');
+  if(!banner) return;
+  const accepted=localStorage.getItem('cookie_consent')==='true';
+  if(!accepted){ banner.classList.add('show'); }
+  document.getElementById('cookieAccept')?.addEventListener('click',()=>{
+    localStorage.setItem('cookie_consent','true'); banner.classList.remove('show');
+  });
+  document.getElementById('cookieDecline')?.addEventListener('click',()=>{ banner.classList.remove('show'); });
+})();
+
+// ===== Brands carousel: autoplay + A11y =====
+(function(){
+  const track = document.getElementById('brandTrack');
+  const prev = document.getElementById('brandPrev');
+  const next = document.getElementById('brandNext');
+  if(!track || !prev || !next) return;
+  const step = 220; // px
+  let timer = null;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function scrollStep(dir=1){
+    track.scrollBy({left: dir*step, behavior: prefersReduced ? 'auto' : 'smooth'});
+    if(track.scrollLeft + track.clientWidth + 4 >= track.scrollWidth){ track.scrollTo({left: 0, behavior: 'auto'}); }
+    if(track.scrollLeft <= 0 && dir < 0){ track.scrollTo({left: track.scrollWidth - track.clientWidth, behavior: 'auto'}); }
+  }
+  prev.addEventListener('click', ()=>scrollStep(-1));
+  next.addEventListener('click', ()=>scrollStep(1));
+  track.addEventListener('keydown', (e)=>{ if(e.key==='ArrowRight'){e.preventDefault();scrollStep(1);} if(e.key==='ArrowLeft'){e.preventDefault();scrollStep(-1);} });
+  function start(){ if(prefersReduced) return; clearInterval(timer); timer=setInterval(()=>scrollStep(1), 3000); }
+  function stop(){ clearInterval(timer); }
+  ['mouseenter','focusin','touchstart'].forEach(ev=>track.addEventListener(ev, stop, {passive:true}));
+  ['mouseleave','focusout','touchend'].forEach(ev=>track.addEventListener(ev, start, {passive:true}));
+  ['mouseenter','focusin','touchstart'].forEach(ev=>prev.addEventListener(ev, stop, {passive:true}));
+  ['mouseleave','focusout','touchend'].forEach(ev=>prev.addEventListener(ev, start, {passive:true}));
+  ['mouseenter','focusin','touchstart'].forEach(ev=>next.addEventListener(ev, stop, {passive:true}));
+  ['mouseleave','focusout','touchend'].forEach(ev=>next.addEventListener(ev, start, {passive:true}));
+  start();
+})();
+
+// ===== Visitors banner (oscillating 80–230) =====
+(function(){
+  const el = document.getElementById('visitorsText');
+  if(!el) return;
+  // deterministic seed per session to look stable on refreshes
+  let n = Number(sessionStorage.getItem('visitors_seed'));
+  if(!n || isNaN(n)) { n = 80 + Math.floor(Math.random()*151); sessionStorage.setItem('visitors_seed', String(n)); }
+  n = Math.min(230, Math.max(80, n));
+  function render(){ el.textContent = `👥 ${n} visitantes online agora`; }
+  function tick(){
+    // random walk: -6..+8 users; clamp to [80,230]
+    const delta = Math.floor(Math.random()*15) - 6;
+    n = Math.min(230, Math.max(80, n + delta));
+    render();
+    // vary interval 8–15s
+    const next = 8000 + Math.floor(Math.random()*7000);
+    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      setTimeout(tick, next);
+    }
+  }
+  render();
+  setTimeout(tick, 9000);
+})();
+</script>
 <footer class="site-footer">
   <div class="container footer-grid">
     <section class="footer-about">
@@ -690,5 +886,11 @@ document.querySelectorAll('.cat-item.has-mega .cat-btn').forEach(btn => {
     </div>
   </div>
 </footer>
+
+<div class="visitors-banner" role="status" aria-live="polite">
+  <span class="dot" aria-hidden="true"></span>
+  <span id="visitorsText">👥 0 visitantes online agora</span>
+</div>
+
 </body>
 </html>
