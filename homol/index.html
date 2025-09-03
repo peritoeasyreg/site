@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+  <!-- Meta básicos -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Easy Reg – Vistorias Ágeis</title>
+  <meta name="description" content="Assessoria e comércio eletrônico: vistorias ágeis, atendimento humano e loja online em um só lugar." />
+  <meta name="theme-color" content="#0c1e26" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="icon" href="/favicon.ico" />
+
+  <!-- Open Graph / Twitter (para compartilhamento) -->
+  <meta property="og:title" content="Easy Reg – Vistorias Ágeis" />
+  <meta property="og:description" content="Assessoria e comércio eletrônico com atendimento ágil." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://easyreg.example/" />
+  <meta property="og:image" content="/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Font Awesome 6 -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- CSS base com temas -->
+  <style>
+:root{--bg:#fff;--fg:#0c1e26;--muted:#3c515a;--brand:#679fad;--brand-strong:#4c8d9d;--chip-bg:#fff;--chip-fg:#0c1e26;--border:#eef2f4;--elev:0 8px 22px rgba(0,0,0,.08);--accent:#0c1e26}body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+
+    :root{
+      --bg: #ffffff; --fg: #0c1e26; --muted:#3c515a; --brand:#679fad; --chip-bg:#ffffff; --chip-fg:#0c1e26; --border:#eef2f4; --elev: 0 8px 22px rgba(0,0,0,.08);
+    }
+    html[data-theme="dark"]{
+      --bg:#0b1417; --fg:#e7eef2; --muted:#b7c6cd; --brand:#6fb3c3; --chip-bg:#132027; --chip-fg:#e7eef2; --border:#18242a; --elev: 0 8px 22px rgba(0,0,0,.4);
+      color-scheme: dark;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--fg); background: var(--bg); line-height: 1.45; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1200px, 100%); margin-inline: auto; padding-inline: 16px; }
+
+    /* Topbar de destaque */
+    .topbar { background: var(--brand); color: #fff; }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
+    .topbar p { font-size: 14px; margin: 8px 0; }
+    .topbar .links { display: inline-flex; align-items: center; gap: 12px; font-weight: 600; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; background: var(--chip-bg); color: var(--chip-fg); border-radius: 999px; padding: 6px 10px; font-size: 13px; box-shadow: var(--elev); }
+
+    /* Header principal */
+    header.site-header { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .header-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand__logo { inline-size: 40px; block-size: 40px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; color: #fff; font-weight: 800; }
+    .brand__text { display: grid; }
+    .brand__title { font-size: clamp(18px, 3.2vw, 22px); font-weight: 800; }
+    .brand__subtitle { font-size: 13px; color: var(--muted); }
+    .theme-toggle { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); background:transparent; color:var(--fg); padding:8px 12px; border-radius:999px; cursor:pointer; }
+
+    /* Slider */
+    .slider { position: relative; isolation: isolate; margin-top: 8px; }
+    .slider__viewport { position: relative; overflow: hidden; border-radius: 12px; background: #0a0a0a; }
+    .slider__track { display: flex; transition: transform 420ms ease; will-change: transform; }
+    .slide { min-width: 100%; aspect-ratio: 16 / 9; display: grid; place-items: center; background: #0a0a0a; }
+    .slide picture, .slide img{ width:100%; height:100%; }
+    .slide img { object-fit: cover; object-position: center; }
+    /* Evitar corte no mobile: preferir contain em telas estreitas */
+    @media (max-width: 640px){
+      .slide { aspect-ratio: 9 / 16; }
+      .slide img { object-fit: contain; background: #0a0a0a; }
+    }
+
+    /* Controles do slider */
+    .slider__controls { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #c9d7dd; border: none; cursor: pointer; }
+    html[data-theme="dark"] .dot{ background:#2e3a40; }
+    .dot[aria-current="true"] { background: var(--brand); }
+    .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); border: none; background: rgba(12,30,38,.72); color: #fff; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.2); }
+    .nav-btn:hover { background: rgba(12,30,38,.9); }
+    .nav-prev { left: 10px; }
+    .nav-next { right: 10px; }
+
+    /* Seção Serviços */
+    section.services{ padding: 40px 0; }
+    .grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .card{ grid-column: span 4; background: var(--chip-bg); color: var(--chip-fg); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow: var(--elev); }
+    .card h3{ margin:0 0 6px; font-size:18px; }
+    .card p{ margin:0; color: var(--muted); font-size:14px; }
+    @media (max-width:900px){ .card{ grid-column: span 6; } }
+    @media (max-width:640px){ .card{ grid-column: span 12; } }
+
+    /* Produtos em destaque */
+    section.featured{ padding: 20px 0 48px; }
+    .product{ grid-column: span 3; border:1px solid var(--border); border-radius:16px; overflow:hidden; background:var(--chip-bg); box-shadow: var(--elev); display:flex; flex-direction:column; }
+    .product img{ aspect-ratio: 1/1; object-fit: cover; }
+    .product .info{ padding:12px; display:grid; gap:6px; }
+    .price{ font-weight:800; }
+    .actions{ display:flex; gap:8px; margin-top:8px; }
+    .btn{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); background:transparent; color:var(--fg); padding:8px 12px; border-radius:10px; cursor:pointer; }
+    .btn.primary{ background: var(--brand); border-color: var(--brand); color:#fff; }
+    @media (max-width:900px){ .product{ grid-column: span 6; } }
+    @media (max-width:640px){ .product{ grid-column: span 12; } }
+
+    /* Botão WhatsApp flutuante */
+    .whatsapp-button { position: fixed; inset: auto 20px 20px auto; background: #25D366; color: #fff; padding: 14px 18px; border-radius: 999px; font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 8px 22px rgba(0,0,0,.2); z-index: 50; }
+    .whatsapp-button:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+
+    /* Cookie banner */
+    .cookie-banner{ position: fixed; left: 16px; right: 16px; bottom: 16px; padding: 12px 14px; background: var(--chip-bg); color: var(--chip-fg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--elev); display:none; z-index:60; }
+    .cookie-banner.show{ display:flex; align-items:center; justify-content:space-between; gap: 12px; }
+
+    /* Acessibilidade e preferências */
+    @media (prefers-reduced-motion: reduce) { .slider__track { transition: none; } }
+  
+/* === Nav + Search (desktop e mobile) === */
+.site-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid var(--border)}
+.nav-list{display:flex;align-items:center;gap:12px;list-style:none;margin:0;padding:0}
+.nav-list a{padding:8px 10px;border-radius:8px}
+.nav-list a:hover{background:var(--border)}
+.search{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:4px 6px}
+.search input{border:0;outline:0;background:transparent;color:var(--fg);padding:6px 8px;min-width:260px}
+.search button{border:0;background:transparent;cursor:pointer;color:var(--fg)}
+
+/* Drawer no mobile (abre com botão #menuToggle) */
+.menu-toggle{display:none;border:1px solid var(--border);background:transparent;color:var(--fg);padding:8px 12px;border-radius:999px;cursor:pointer}
+@media(max-width:860px){
+  .menu-toggle{display:inline-flex;align-items:center;gap:8px}
+  .site-nav{position:fixed;inset:64px 16px 16px 16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;box-shadow:var(--elev);padding:16px;display:none;flex-direction:column;align-items:stretch;gap:16px;z-index:40}
+  .site-nav.open{display:flex}
+  .nav-list{flex-direction:column;align-items:flex-start}
+  .search input{min-width:0;width:100%}
+}
+
+  /* branding */.mainbar{background:var(--brand)}.search-hero button{background:var(--accent)}.category-bar{background:#fff;border-bottom:1px solid var(--border)}.cat-link:hover,.cat-btn:hover{color:var(--brand-strong)}.promo-cta{background:var(--brand)}.quick-icons a{background:#ffffff22}
+  .utilbar{background:#f7fafb;color:var(--muted);font-size:12px}.util-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:32px}.util-row a{padding:6px 8px}.bar-row{display:grid;grid-template-columns:minmax(180px,260px) 1fr auto;align-items:center;gap:12px;min-height:72px}.brand-link{display:flex;align-items:center;gap:10px;color:#fff}.brand-logo{width:40px;height:40px;object-fit:contain;border-radius:8px;background:#fff}.brand-name{font-size:20px;color:#fff}.search-hero{display:flex;align-items:center;gap:10px;background:#fff;border-radius:999px;padding:8px 12px;color:#0c1e26}.search-hero i{color:#6b7a83}.search-hero input{flex:1;min-width:280px;border:0;outline:0;background:transparent;color:#0c1e26}.search-hero button{border:0;color:#fff;padding:8px 14px;border-radius:999px;cursor:pointer}.quick-icons a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;margin-left:6px}.cat-list{display:flex;gap:18px;align-items:center;list-style:none;margin:0;padding:0}.cat-link,.cat-btn{display:inline-flex;align-items:center;gap:6px;padding:14px 6px;color:var(--fg);font-weight:600}.cat-btn{background:transparent;border:0;cursor:pointer}.cat-item{position:relative}.has-mega .mega-panel{position:absolute;left:0;right:0;top:100%;background:#fff;display:none;border:1px solid var(--border);border-top:0;box-shadow:0 16px 40px rgba(0,0,0,.08);padding:16px;z-index:50;color:var(--fg)}.has-mega:hover .mega-panel{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:16px}.mega-col h4{margin:0 0 8px;font-size:14px;color:var(--muted)}.mega-col a{display:block;padding:6px 8px;border-radius:8px}.mega-col a:hover{background:#f5f7f9}.mega-col.highlight .promo{background:#eef7fb;color:#0c1e26;font-weight:700}@media(max-width:1024px){.bar-row{grid-template-columns:minmax(140px,1fr) 1fr auto}.search-hero input{min-width:180px}}@media(max-width:860px){.bar-row{grid-template-columns:1fr;gap:8px;padding:8px 0}.quick-icons{display:none}.category-bar{position:fixed;inset:64px 16px 16px 16px;background:#fff;color:var(--fg);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.16);display:none;z-index:60}.category-bar.open{display:block}.cat-list{flex-direction:column;align-items:flex-start}.cat-link,.cat-btn{color:var(--fg);padding:10px 8px}.has-mega .mega-panel{position:static;display:none;border:0;box-shadow:none;padding:8px 0 8px 8px}.has-mega.open .mega-panel{display:grid}}
+  </style>
+
+  <!-- JSON-LD simples para SEO local (ajuste os dados reais) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Easy Reg",
+    "url": "https://easyreg.example/",
+    "telephone": "+55-11-99999-9999",
+    "image": "/og-image.jpg",
+    "description": "Assessoria e comércio eletrônico – Vistorias ágeis e atendimento humano.",
+    "address": {"@type": "PostalAddress","addressCountry": "BR"}
+  }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Topbar -->
+  <div class="topbar" role="region" aria-label="Informações e atalhos">
+    <div class="container topbar-inner">
+      <p>A melhor assessoria e comércio eletrônico pra você em um só local.</p>
+      <nav class="links" aria-label="Atalhos rápidos">
+        <a class="chip" href="/loja" aria-label="Abrir a loja online">
+          <i class="fa-solid fa-store" aria-hidden="true"></i>
+          <span>Nossa loja</span>
+        </a>
+        <a class="chip" href="https://wa.me/message/MNU27I5VFP2CD1" target="_blank" rel="noopener">
+          <i class="fa-solid fa-headset" aria-hidden="true"></i>
+          <span>Atendimento</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Header principal -->
+  
+<header class="site-header centauro-like">
+  <div class="utilbar">
+    <div class="container util-row">
+      <nav class="util-left" aria-label="Links rápidos">
+        <a href="/acessibilidade">Acessibilidade</a>
+        <a href="/blog">Blog</a>
+        <a href="/trocas">Troca e Devolução</a>
+      </nav>
+      <nav class="util-right" aria-label="Ações">
+        <a href="/atendimento"><i class="fa-regular fa-circle-question"></i> Atendimento</a>
+        <a href="/empresas"><i class="fa-regular fa-building"></i> Para empresas</a>
+      </nav>
+    </div>
+  </div>
+  <div class="mainbar">
+    <div class="container bar-row">
+      <a class="brand-link" href="/" aria-label="Easy Reg">
+        <img class="brand-logo" src="assets/images/easyreg-logo.webp" alt="Easy Reg" width="40" height="40">
+        <strong class="brand-name">Easy Reg</strong>
+      </a>
+      <form class="search search-hero" action="/loja" method="get" role="search" aria-label="Buscar produtos">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" name="q" placeholder="O que você procura?"
+               maxlength="100" inputmode="search"
+               pattern="^[\p{L}\p{N}\s\-_,\.]{1,100}$"
+               title="Use letras, números e espaços" autocomplete="on" />
+        <button type="submit" aria-label="Buscar">Buscar</button>
+      </form>
+      <div class="quick-icons">
+        <a href="/entrar" title="Entrar"><i class="fa-regular fa-user"></i></a>
+        <a href="/favoritos" title="Favoritos"><i class="fa-regular fa-heart"></i></a>
+        <a href="/carrinho" title="Carrinho"><i class="fa-solid fa-cart-shopping"></i></a>
+      </div>
+    </div>
+  </div>
+  <nav id="categoryBar" class="category-bar" aria-label="Categorias">
+    <div class="container">
+      <ul class="cat-list">
+        <li class="cat-item has-mega">
+          <button class="cat-btn" aria-expanded="false">Vistorias</button>
+          <div class="mega-panel">
+            <div class="mega-col">
+              <h4>Serviços</h4>
+              <a href="/loja?q=vistoria+veicular">Vistoria Veicular</a>
+              <a href="/loja?q=laudo">Laudos</a>
+              <a href="/loja?q=pericia">Perícia</a>
+            </div>
+            <div class="mega-col">
+              <h4>Agilidade</h4>
+              <a href="/loja?q=express">Express</a>
+              <a href="/loja?q=domiciliar">Domiciliar</a>
+              <a href="/loja?q=corporativo">Corporativo</a>
+            </div>
+            <div class="mega-col highlight">
+              <h4>Destaque</h4>
+              <a class="promo" href="/loja?q=promo">Ofertas da semana</a>
+            </div>
+          </div>
+        </li>
+        <li class="cat-item"><a class="cat-link" href="/loja?q=assessoria">Assessoria</a></li>
+        <li class="cat-item"><a class="cat-link" href="/loja?q=acessorios">Acessórios</a></li>
+        <li class="cat-item"><a class="cat-link" href="/loja?q=planos">Planos</a></li>
+        <li class="cat-item"><a class="cat-link" href="/loja?q=outlet">Outlet</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+
+  <!-- Slider herói -->
+  <main class="container" id="conteudo">
+    <section class="slider" aria-label="Destaques Easy Reg">
+      <div class="slider__viewport" id="viewport">
+        <button class="nav-btn nav-prev" id="prev" aria-label="Slide anterior" title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="nav-btn nav-next" id="next" aria-label="Próximo slide" title="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
+
+        <div class="slider__track" id="track">
+          <!-- Exemplo com <picture>
+              <source srcset="assets/slides/slide_01-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_01.webp" type="image/webp"> para responsividade real (substitua por seus arquivos) -->
+          <figure class="slide">
+            <picture>
+              <source srcset="./images/slide_01-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_01.png" alt="Atendimento rápido Easy Reg" loading="eager" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_02-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_02.webp" type="image/webp">
+              <source srcset="./images/slide_02-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_02.png" alt="Vistorias ágeis e seguras" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_03-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_03.webp" type="image/webp">
+              <source srcset="./images/slide_03-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_03.png" alt="Equipe especializada pronta para ajudar" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_04-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_04.webp" type="image/webp">
+              <source srcset="./images/slide_04-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_04.png" alt="Tecnologia que facilita sua vida" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_05-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_05.webp" type="image/webp">
+              <source srcset="./images/slide_05-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_05.png" alt="Laudos com clareza e precisão" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_06-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_06.webp" type="image/webp">
+              <source srcset="./images/slide_06-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_06.png" alt="Processos transparentes" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_07-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_07.webp" type="image/webp">
+              <source srcset="./images/slide_07-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_07.png" alt="Suporte via WhatsApp" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_08-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_08.webp" type="image/webp">
+              <source srcset="./images/slide_08-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_08.png" alt="Resultados que você confia" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+          <figure class="slide">
+            <picture>
+              <source srcset="assets/slides/slide_09-mobile.webp" media="(max-width:640px)" type="image/webp">
+              <source srcset="assets/slides/slide_09.webp" type="image/webp">
+              <source srcset="./images/slide_09-mobile.png" media="(max-width:640px)">
+              <img src="./images/slide_09.png" alt="Easy Reg – sua parceira de vistorias" loading="lazy" width="1920" height="1080">
+            </picture>
+          </figure>
+        </div>
+      </div>
+
+      <div class="slider__controls" role="tablist" aria-label="Navegação do carrossel" id="dots"></div>
+    </section>
+
+    <!-- Serviços -->
+    <section class="services" aria-labelledby="srv-title">
+      <h2 id="srv-title">Nossos serviços</h2>
+      <div class="grid" style="margin-top:16px;">
+        <article class="card"><h3><a href="https://wa.me/message/MNU27I5VFP2CD1"><i class="fa-solid fa-clipboard-check"></i> Vistorias</h3><p>Laudos rápidos e claros, com envio digital.</p></a></article>
+        <article class="card"><h3><a href="https://wa.me/message/MNU27I5VFP2CD1"><i class="fa-solid fa-shield-halved"></i> Assessoria</h3><p>Suporte completo no processo e documentação.</p></a></article>
+        <article class="card"><h3><a href="/loja"><i class="fa-solid fa-store"></i> Loja</h3><p>Itens e soluções para o seu dia a dia, 100% online.</p></a></article>
+      </div>
+    </section>
+
+    <!-- Produtos em destaque (exemplos estáticos) -->
+    <section class="featured" aria-labelledby="feat-title">
+      <h2 id="feat-title">Produtos em destaque</h2>
+      <div class="grid" style="margin-top:16px;">
+        <article class="product">
+          <img src="/produtos/prod1.jpg" alt="Produto 1">
+          <div class="info">
+            <h3>Produto 1</h3>
+            <div class="price">R$ 99,90</div>
+            <div class="actions">
+              <a class="btn" href="/loja"><i class="fa-solid fa-eye"></i> Ver</a>
+              <a class="btn primary" href="/loja"><i class="fa-solid fa-cart-plus"></i> Comprar</a>
+            </div>
+          </div>
+        </article>
+        <article class="product">
+          <img src="/produtos/prod2.jpg" alt="Produto 2">
+          <div class="info">
+            <h3>Produto 2</h3>
+            <div class="price">R$ 149,90</div>
+            <div class="actions">
+              <a class="btn" href="/loja"><i class="fa-solid fa-eye"></i> Ver</a>
+              <a class="btn primary" href="/loja"><i class="fa-solid fa-cart-plus"></i> Comprar</a>
+            </div>
+          </div>
+        </article>
+        <article class="product">
+          <img src="/produtos/prod3.jpg" alt="Produto 3">
+          <div class="info">
+            <h3>Produto 3</h3>
+            <div class="price">R$ 59,90</div>
+            <div class="actions">
+              <a class="btn" href="/loja"><i class="fa-solid fa-eye"></i> Ver</a>
+              <a class="btn primary" href="/loja"><i class="fa-solid fa-cart-plus"></i> Comprar</a>
+            </div>
+          </div>
+        </article>
+        <article class="product">
+          <img src="/produtos/prod4.jpg" alt="Produto 4">
+          <div class="info">
+            <h3>Produto 4</h3>
+            <div class="price">R$ 199,90</div>
+            <div class="actions">
+              <a class="btn" href="/loja"><i class="fa-solid fa-eye"></i> Ver</a>
+              <a class="btn primary" href="/loja"><i class="fa-solid fa-cart-plus"></i> Comprar</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Botão WhatsApp flutuante -->
+  <a class="whatsapp-button" href="https://wa.me/message/MNU27I5VFP2CD1" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+    <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+    <span>WhatsApp</span>
+  </a>
+
+  <!-- Cookie/Consent Banner (carrega analytics somente após consentimento) -->
+  <div id="cookieBanner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Consentimento de cookies">
+    <div>
+      Usamos cookies para métricas anônimas. Ao aceitar, ativamos as medições.
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn" id="cookieDecline">Agora não</button>
+      <button class="btn primary" id="cookieAccept">Aceitar</button>
+    </div>
+  </div>
+
+  <!-- JS mínimo para tema, slider, consentimento e analytics -->
+  <script>
+  (function(){
+        const savedTheme = localStorage.getItem('theme');
+    if(savedTheme){ root.setAttribute('data-theme', savedTheme); themeLabel.textContent = 'Tema: ' + (savedTheme==='dark'?'escuro':'claro'); }
+    themeToggle.addEventListener('click', ()=>{
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeLabel.textContent = 'Tema: ' + (next==='dark'?'escuro':'claro');
+    });
+
+    // ===== Slider acessível =====
+    const track = document.getElementById('track');
+    const dotsWrap = document.getElementById('dots');
+    const slides = Array.from(track.children);
+    const prev = document.getElementById('prev');
+    const next = document.getElementById('next');
+    const viewport = document.getElementById('viewport');
+    let index = 0; let timer = null; const AUTOPLAY_MS = 5000;
+
+    slides.forEach((_, i) => {
+      const b = document.createElement('button');
+      b.className = 'dot'; b.setAttribute('role','tab'); b.setAttribute('aria-label', 'Ir para o slide ' + (i+1));
+      b.addEventListener('click', () => go(i)); dotsWrap.appendChild(b);
+    });
+
+    function update(){
+      track.style.transform = `translateX(-${index * 100}%)`;
+      [...dotsWrap.children].forEach((d, i) => d.setAttribute('aria-current', i === index));
+    }
+    function go(i){ index = (i + slides.length) % slides.length; update(); resetAutoplay(); }
+    function nextSlide(){ go(index + 1); }
+    function prevSlide(){ go(index - 1); }
+
+    next.addEventListener('click', nextSlide); prev.addEventListener('click', prevSlide);
+    document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+    // Swipe
+    let startX = 0; let dx = 0;
+    viewport.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; dx = 0; }, {passive:true});
+    viewport.addEventListener('touchmove', (e) => { dx = e.touches[0].clientX - startX; }, {passive:true});
+    viewport.addEventListener('touchend', () => { if (Math.abs(dx) > 50) { dx < 0 ? nextSlide() : prevSlide(); } });
+
+    function resetAutoplay(){ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; clearInterval(timer); timer = setInterval(nextSlide, AUTOPLAY_MS); }
+    window.addEventListener('load', () => { update(); resetAutoplay(); });
+
+    // ===== Cookie consent + Analytics =====
+    const banner = document.getElementById('cookieBanner');
+    const accepted = localStorage.getItem('cookie_consent') === 'true';
+    if(!accepted){ banner.classList.add('show'); }
+
+    document.getElementById('cookieAccept').addEventListener('click', ()=>{
+      localStorage.setItem('cookie_consent','true'); banner.classList.remove('show');
+      enableAnalytics();
+    });
+    document.getElementById('cookieDecline').addEventListener('click', ()=>{ banner.classList.remove('show'); });
+
+    if(accepted){ enableAnalytics(); }
+
+    function enableAnalytics(){
+      // === GA4 (substitua G-XXXX por seu ID) com anonimização de IP ===
+      // const ga = document.createElement('script'); ga.async = true; ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXX'; document.head.appendChild(ga);
+      // window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-XXXX', { 'anonymize_ip': true });
+
+      // === Matomo (exemplo self-hosted) com anonimização de IP ===
+      // var _paq = window._paq = window._paq || []; _paq.push(['trackPageView']); _paq.push(['enableLinkTracking']); _paq.push(['setDoNotTrack', true]); _paq.push(['requireCookieConsent']); _paq.push(['setCookieConsentGiven']); _paq.push(['anonymizeIp']);
+      // (function(){ var u="https://matomo.seudominio/"; _paq.push(['setTrackerUrl', u+'matomo.php']); _paq.push(['setSiteId', '1']); var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s); })();
+    }
+  })();
+
+// ===== Menu hamburger =====
+const menuToggle=document.getElementById('menuToggle');
+const nav=document.getElementById('siteNav');
+if(menuToggle && nav){
+  menuToggle.addEventListener('click',()=>{
+    const open=nav.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', open?'true':'false');
+  });
+}
+
+// ===== Busca (GET /loja?q=...) =====
+const searchForm=document.querySelector('form.search');
+if(searchForm){
+  searchForm.addEventListener('submit',(e)=>{
+    const q=(searchForm.querySelector('[name="q"]').value||'').trim();
+    if(!q){ e.preventDefault(); }
+  });
+}
+
+
+// ===== Slider (carrossel) =====
+const track=document.getElementById('track');
+const dots=document.getElementById('dots');
+const slides=track?Array.from(track.children):[];
+const btnNext=document.getElementById('next');
+const btnPrev=document.getElementById('prev');
+const viewport=document.getElementById('viewport');
+let idx=0, timer=null;
+if (slides.length){
+  slides.forEach((_,i)=>{ const b=document.createElement('button'); b.className='dot'; b.addEventListener('click',()=>go(i)); dots.appendChild(b); });
+  function update(){ track.style.transform=`translateX(-${idx*100}%)`; [...dots.children].forEach((d,i)=>d.setAttribute('aria-current', i===idx)); }
+  function go(i){ idx=(i+slides.length)%slides.length; update(); reset(); }
+  function next(){ go(idx+1); } function prev(){ go(idx-1); }
+  btnNext&&btnNext.addEventListener('click', next);
+  btnPrev&&btnPrev.addEventListener('click', prev);
+  // swipe
+  let sx=0, dx=0;
+  viewport&&viewport.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; dx=0; }, {passive:true});
+  viewport&&viewport.addEventListener('touchmove',e=>{ dx=e.touches[0].clientX-sx; }, {passive:true});
+  viewport&&viewport.addEventListener('touchend',()=>{ if(Math.abs(dx)>50){ dx<0?next():prev(); } });
+  function reset(){ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; clearInterval(timer); timer=setInterval(next,5000); }
+  window.addEventListener('load', ()=>{ update(); reset(); });
+}
+
+
+// ===== Hardening da busca =====
+if (searchForm){
+  searchForm.addEventListener('submit',(e)=>{
+    const input=searchForm.querySelector('[name="q"]');
+    let q=(input.value||'').trim();
+    if(!q){ e.preventDefault(); return; }
+    // normaliza espaços e limita tamanho
+    q=q.replace(/\s+/g,' ').slice(0,100);
+    // aplica ao action com encoding seguro (mantém método GET padrão)
+    searchForm.action = '/loja';
+    input.value = q; // servidor deve validar novamente
+  });
+}
+
+
+// ===== Busca (hardening) =====
+const heroSearch = document.querySelector('form.search-hero');
+if (heroSearch) {
+  heroSearch.addEventListener('submit', (e) => {
+    const input = heroSearch.querySelector('[name="q"]');
+    let q = (input.value || '').trim().replace(/\s+/g, ' ').slice(0,100);
+    if (!q) { e.preventDefault(); return; }
+    input.value = q;
+    heroSearch.action = '/loja';
+  });
+}
+document.querySelectorAll('.cat-item.has-mega .cat-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const li = e.currentTarget.closest('.cat-item');
+    const isMobile = window.matchMedia('(max-width: 860px)').matches;
+    if (isMobile) {
+      li.classList.toggle('open');
+      btn.setAttribute('aria-expanded', li.classList.contains('open'));
+    }
+  });
+});
+
+
+// ===== Produtos em destaque (client-side) =====
+(async function(){
+  const grid = document.getElementById('featuredGrid') || document.querySelector('.featured .grid');
+  if (!grid) return;
+  try{
+    const res = await fetch('/assets/data/products.json', {cache:'no-store'});
+    if(!res.ok) throw new Error('fail');
+    const items = await res.json();
+    grid.innerHTML = items.map(p => `
+      <article class="product">
+        <img src="${p.img}" alt="${p.title}">
+        <div class="info">
+          <h3>${p.title}</h3>
+          <div class="price">R$ ${p.price.toFixed(2).replace('.', ',')}</div>
+          <div class="actions">
+            <a class="btn primary" href="${p.url}"><i class="fa-solid fa-bag-shopping"></i> Comprar</a>
+            <a class="btn" href="/loja?q=${encodeURIComponent(p.title)}"><i class="fa-solid fa-magnifying-glass"></i> Ver</a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }catch(e){}
+})();
+  </script>
+</body>
+</html>
