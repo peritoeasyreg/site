@@ -132,8 +132,57 @@
   .search input{min-width:0;width:100%}
 }
 
-  /* branding */.mainbar{background:var(--brand)}.search-hero button{background:var(--accent)}.category-bar{background:#fff;border-bottom:1px solid var(--border)}.cat-link:hover,.cat-btn:hover{color:var(--brand-strong)}.promo-cta{background:var(--brand)}.quick-icons a{background:#ffffff22}
+  /* branding */.mainbar{background:var(--brand)}.search-hero button{background:#325f5e}.category-bar{background:#fff;border-bottom:1px solid var(--border)}.cat-link:hover,.cat-btn:hover{color:var(--brand-strong)}.promo-cta{background:var(--brand)}.quick-icons a{background:#ffffff22}
   .utilbar{background:#f7fafb;color:var(--muted);font-size:12px}.util-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:32px}.util-row a{padding:6px 8px}.bar-row{display:grid;grid-template-columns:minmax(180px,260px) 1fr auto;align-items:center;gap:12px;min-height:72px}.brand-link{display:flex;align-items:center;gap:10px;color:#fff}.brand-logo{width:40px;height:40px;object-fit:contain;border-radius:8px;background:#fff}.brand-name{font-size:20px;color:#fff}.search-hero{display:flex;align-items:center;gap:10px;background:#fff;border-radius:999px;padding:8px 12px;color:#0c1e26}.search-hero i{color:#6b7a83}.search-hero input{flex:1;min-width:280px;border:0;outline:0;background:transparent;color:#0c1e26}.search-hero button{border:0;color:#fff;padding:8px 14px;border-radius:999px;cursor:pointer}.quick-icons a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;margin-left:6px}.cat-list{display:flex;gap:18px;align-items:center;list-style:none;margin:0;padding:0}.cat-link,.cat-btn{display:inline-flex;align-items:center;gap:6px;padding:14px 6px;color:var(--fg);font-weight:600}.cat-btn{background:transparent;border:0;cursor:pointer}.cat-item{position:relative}.has-mega .mega-panel{position:absolute;left:0;right:0;top:100%;background:#fff;display:none;border:1px solid var(--border);border-top:0;box-shadow:0 16px 40px rgba(0,0,0,.08);padding:16px;z-index:50;color:var(--fg)}.has-mega:hover .mega-panel{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:16px}.mega-col h4{margin:0 0 8px;font-size:14px;color:var(--muted)}.mega-col a{display:block;padding:6px 8px;border-radius:8px}.mega-col a:hover{background:#f5f7f9}.mega-col.highlight .promo{background:#eef7fb;color:#0c1e26;font-weight:700}@media(max-width:1024px){.bar-row{grid-template-columns:minmax(140px,1fr) 1fr auto}.search-hero input{min-width:180px}}@media(max-width:860px){.bar-row{grid-template-columns:1fr;gap:8px;padding:8px 0}.quick-icons{display:none}.category-bar{position:fixed;inset:64px 16px 16px 16px;background:#fff;color:var(--fg);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.16);display:none;z-index:60}.category-bar.open{display:block}.cat-list{flex-direction:column;align-items:flex-start}.cat-link,.cat-btn{color:var(--fg);padding:10px 8px}.has-mega .mega-panel{position:static;display:none;border:0;box-shadow:none;padding:8px 0 8px 8px}.has-mega.open .mega-panel{display:grid}}
+  
+/* ===== Brands carousel ===== */
+section.brands{padding:24px 0}
+.brands-sub{color:var(--muted); margin-top:-6px; margin-bottom:8px}
+.brand-carousel{position:relative}
+.brand-track{display:flex; gap:24px; overflow:hidden; scroll-behavior:smooth; padding:12px 6px}
+.brand{flex:0 0 auto; width:160px; height:72px; display:grid; place-items:center; border:1px solid var(--border); border-radius:12px; background:#fff; box-shadow:var(--elev)}
+.brand img{max-width:140px; max-height:48px}
+.brand-nav{position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; border:0; background:#e5393515; color:#e53935; display:grid; place-items:center; cursor:pointer}
+.brand-nav.prev{left:-4px} .brand-nav.next{right:-4px}
+@media(max-width:640px){ .brand{width:140px} .brand img{max-width:120px}}
+
+/* ===== Footer ===== */
+.site-footer{background:#153b4a; color:#eaf2f5; margin-top:32px}
+.site-footer a{color:#eaf2f5}
+.footer-grid{display:grid; grid-template-columns: 1.2fr 1fr 1fr 1.2fr; gap:24px; padding:28px 0}
+.footer-col ul{list-style:none; margin:0; padding:0}
+.footer-col li{margin:8px 0}
+.footer-about .nps{margin:12px 0}
+.payments{display:flex; align-items:center; gap:10px; font-size:26px}
+.payments .pix{font-size:14px; font-weight:800; background:#00b894; color:#0b1b23; padding:4px 8px; border-radius:6px}
+.social a{display:inline-flex; width:36px; height:36px; border:1px solid #2a4a57; border-radius:50%; align-items:center; justify-content:center; margin-right:6px}
+.footnote{background:#0e2a35; border-top:1px solid #0a2029; font-size:12px}
+.footnote .container{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0}
+@media(max-width:960px){ .footer-grid{grid-template-columns: 1fr 1fr} }
+@media(max-width:640px){ .footer-grid{grid-template-columns:1fr} .footnote .container{flex-direction:column; align-items:flex-start} }
+
+  
+/* ===== Slider (banners) ===== */
+.slider{position:relative;margin-top:8px}
+.slider__viewport{position:relative;overflow:hidden;border-radius:12px;background:#0a0a0a}
+.slider__track{display:flex;transition:transform 420ms ease;will-change:transform}
+.slide{min-width:100%;aspect-ratio:16/9;display:grid;place-items:center;background:#0a0a0a}
+.slide img{width:100%;height:100%;object-fit:cover;object-position:center}
+@media(max-width:640px){.slide{aspect-ratio:9/16}.slide img{object-fit:contain;background:#0a0a0a}}
+.slider__controls{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:#c9d7dd;border:none;cursor:pointer}
+.dot[aria-current="true"]{background:var(--brand,#679fad)}
+.nav-btn{position:absolute;top:50%;transform:translateY(-50%);border:none;background:rgba(12,30,38,.72);color:#fff;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+.nav-btn:hover{background:rgba(12,30,38,.9)}
+.nav-prev{left:10px}.nav-next{right:10px}
+
+  
+/* ===== Cookie banner ===== */
+.cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;padding:12px 14px;background:var(--chip-bg,#fff);color:var(--chip-fg,#0c1e26);border:1px solid var(--border,#eef2f4);border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.18);display:none;z-index:9999}
+.cookie-banner.show{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cookie-banner .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border,#eef2f4);background:transparent;color:inherit;padding:8px 12px;border-radius:10px;cursor:pointer}
+.cookie-banner .btn.primary{background:var(--brand,#679fad);border-color:var(--brand,#679fad);color:#fff}
+
   </style>
 
   <!-- JSON-LD simples para SEO local (ajuste os dados reais) -->
@@ -584,5 +633,62 @@ document.querySelectorAll('.cat-item.has-mega .cat-btn').forEach(btn => {
   }catch(e){}
 })();
   </script>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <section class="footer-about">
+      <h3>Easy Reg</h3>
+      <p>Referência em vistorias e assessoria. Atendimento humano e ágil, com presença digital e suporte em todo o Brasil.</p>
+      <img class="nps" src="assets/images/nps-badge.svg" alt="Selo de recomendação" width="160" height="160">
+      <div class="payments">
+        <i class="fa-brands fa-cc-visa" title="Visa"></i>
+        <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+        <i class="fa-brands fa-cc-amex" title="Amex"></i>
+        <i class="fa-brands fa-cc-apple-pay" title="Apple Pay"></i>
+        <span class="pix">PIX</span>
+      </div>
+    </section>
+    <section class="footer-col">
+      <h4>Informações</h4>
+      <ul>
+        <li><a href="/lojas">Lojas</a></li>
+        <li><a href="/sobre">Sobre Nós</a></li>
+        <li><a href="/privacidade">Política de Privacidade</a></li>
+        <li><a href="/trabalhe-conosco">Trabalhe Conosco</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/mapa-do-site">Mapa do site</a></li>
+      </ul>
+    </section>
+    <section class="footer-col">
+      <h4>Ajuda</h4>
+      <ul>
+        <li><a href="/conta">Minha Conta</a></li>
+        <li><a href="/entregas">Entregas e Retiradas</a></li>
+        <li><a href="/pagamentos">Pagamentos e Reembolsos</a></li>
+        <li><a href="/trocas">Trocas e Devoluções</a></li>
+        <li><a href="/faq">Perguntas Frequentes</a></li>
+        <li><a href="/frete">Regulamento de Frete</a></li>
+      </ul>
+    </section>
+    <section class="footer-contact">
+      <h4>Fale Conosco</h4>
+      <p>Suporte de segunda a sábado, 8h–22h. Domingos e feriados, 8h–16h.</p>
+      <p><i class="fa-solid fa-phone"></i> (11) 98931-7332</p>
+      <p><i class="fa-regular fa-envelope"></i> contato@easyreg.com.br</p>
+      <div class="social">
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+      <address>Rua São Quirino 36, São Paulo, SP, 02056-070</address>
+    </section>
+  </div>
+  <div class="footnote">
+    <div class="container">
+      <p>Copyright © <span id="year"></span> Easy Reg. Todos os direitos reservados.</p>
+      <p class="powered">Desenvolvido por Easy Reg</p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>
