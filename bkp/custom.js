@@ -1,5 +1,5 @@
-<script type="application/ld+json">
-  {
+/*
+{
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Easy Reg",
@@ -9,7 +9,8 @@
     "description": "Assessoria e comércio eletrônico – Vistorias ágeis e atendimento humano.",
     "address": {"@type": "PostalAddress","addressCountry": "BR"}
   }
-  
+*/
+
 // ===== Slider (banners) =====
 (function(){
   const viewport = document.getElementById('viewport');
@@ -74,5 +75,3 @@
   ['mouseleave','focusout','touchend'].forEach(ev=>next.addEventListener(ev, start, {passive:true}));
   start();
 })();
-
-</script>

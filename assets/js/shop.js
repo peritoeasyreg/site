@@ -280,17 +280,21 @@ function cartCount() {
 /* ===================================
    UI: Painel de Carrinho (rodapé)
 =================================== */
+const DISABLE_CART_PANEL = (window.IS_CHECKOUT === true) || /\/checkout\.(?:html?|php)(?:\?|$)/i.test(location.pathname);
+
 let __CART_ROOT = null;
 
 function ensureCartRoot() {
-  if (__CART_ROOT) return;
+    if (typeof DISABLE_CART_PANEL !== 'undefined' && DISABLE_CART_PANEL) return;
+if (__CART_ROOT) return;
   __CART_ROOT = document.createElement('div');
   __CART_ROOT.className = 'cart-panel';
   document.body.appendChild(__CART_ROOT);
 }
 
 function renderCartPanel() {
-  ensureCartRoot();
+    if (typeof DISABLE_CART_PANEL !== 'undefined' && DISABLE_CART_PANEL) return;
+ensureCartRoot();
   const ids = Object.keys(cartMap);
   if (!ids.length) {
     __CART_ROOT.innerHTML = '';
@@ -332,7 +336,7 @@ function renderCartPanel() {
       </div>
       <div class="cart-foot">
         <div class="cart-total">Total: ${BRL.format(cartTotal())}</div>
-        <a class="btn-checkout" href="https://easyreg.smartzeus.com.br/checkout.php">Checkout</a>
+        <a class="btn-checkout" href="/checkout.html">Checkout</a>
       </div>
     </div>
   `;
