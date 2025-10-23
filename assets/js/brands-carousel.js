@@ -16,10 +16,10 @@
       var track = document.createElement('div');
       track.className = 'brands-track';
       track.style.display = 'flex'; track.style.gap = '36px'; track.style.willChange='transform';
-      var brands = ["vonixx","honda","volkswagen","audi","chevrolet","peugeot","jeep","toyota","byd","bmw","ford","fiat","chery","mitsubishi","nissan","hyundai","volvo"];
+      var brands = ["logo_bmw_web","logo_audi_web","logo_byd_web","logo_chevrolet_web","logo_citroen_web","logo_fiat_web","logo_nissan_web","logo_vonnix_web","logo_honda_web","logo_hyundai_web","logo_jeep_web","logo_lexus_web","logo_mercedes_web","logo_peugeot_web","logo_porsche_web","logo_renault_web","logo_toyota_web","logo_volvo_web","logo_vw_volkswagen_web"];
       brands.forEach(function(name){
         var img = document.createElement('img');
-        img.src = './assets/img/'+name+'.svg';
+        img.src = './assets/img/'+name+'.webp';
         img.alt = name.charAt(0).toUpperCase()+name.slice(1);
         img.height = 30; img.loading = 'lazy';
         track.appendChild(img);
