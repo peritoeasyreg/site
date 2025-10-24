@@ -21,7 +21,7 @@
         var img = document.createElement('img');
         img.src = './assets/img/'+name+'.webp';
         img.alt = name.charAt(0).toUpperCase()+name.slice(1);
-        img.height = 30; img.loading = 'lazy';
+        img.height = 80; img.loading = 'lazy';
         track.appendChild(img);
       });
       wrap.appendChild(track);
