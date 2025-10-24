@@ -4,21 +4,36 @@
 <head>
   <!-- Meta básicos -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Easy Reg – Vistorias Ágeis</title>
   <meta name="description"
     content="Assessoria e comércio eletrônico: vistorias ágeis, atendimento humano e loja online em um só lugar." />
   <meta name="theme-color" content="#679fad" />
   <meta name="format-detection" content="telephone=no" />
-  <link rel="icon" href="./favicon.ico" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="rating" content="general">
+  <meta name="author" content="Easy Reg">
+  <meta name="publisher" content="easyreg.com.br">
+  <meta name="copyright" content="© 2025 Easy Reg">
+  <meta http-equiv="content-language" content="pt-BR">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Xss-Protection" content="1; mode=block">
+  <meta http-equiv="Strict-Transport-Security" content="max-age=15552000">
+  <link rel="canonical" href="https://easyreg.com.br">
+  <link rel="icon" href="assets/img/favicon.ico" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="#679fad">
+  <meta name="msapplication-TileColor" content="#679fad">
+
+
 
   <!-- Open Graph / Twitter (para compartilhamento) -->
   <meta property="og:title" content="Easy Reg – Vistorias Ágeis" />
   <meta property="og:description" content="Assessoria e comércio eletrônico com atendimento ágil." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://easyreg.example/" />
-  <meta property="og:image" content="/og-image.jpg" />
+  <meta property="og:url" content="https://easyreg.com.br/" />
+  <meta property="og:image" content="assets/img/logo_easyreg.webp " />
   <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Font Awesome 6 -->
@@ -29,7 +44,7 @@
 
 
   <!-- CSS base com temas -->
-   <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="theme.css">
 
   <!-- JSON-LD simples para SEO local (ajuste os dados reais) -->
   <!--  custom.js -->
@@ -47,17 +62,19 @@
       gap: 16px;
       align-items: stretch;
     }
+
     .product {
-      border: 1px solid rgba(0,0,0,.08);
+      border: 1px solid rgba(0, 0, 0, .08);
       border-radius: 14px;
       overflow: hidden;
       background: #fff;
-      box-shadow: 0 1px 6px rgba(0,0,0,.04);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .04);
       width: 250px;
       max-width: 100%;
       display: flex;
       flex-direction: column;
     }
+
     .product .media {
       position: relative;
       width: 100%;
@@ -68,6 +85,7 @@
       justify-content: center;
       overflow: hidden;
     }
+
     .product .media img {
       max-width: 150px;
       max-height: 150px;
@@ -77,6 +95,7 @@
       display: block;
       background: transparent;
     }
+
     .product .media.noimg::before {
       content: "\f03e";
       font-family: "Font Awesome 6 Free";
@@ -84,9 +103,28 @@
       font-size: 32px;
       color: #94a3b8;
     }
-    .product .info { padding: 12px; display:flex; flex-direction:column; gap:8px; }
-    .product h3 { font-size: 15px; margin: 0; line-height: 1.3; }
-    .brand-stock { display: flex; gap: 6px; color: #667; align-items:center; flex-wrap: wrap; }
+
+    .product .info {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product h3 {
+      font-size: 15px;
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .brand-stock {
+      display: flex;
+      gap: 6px;
+      color: #667;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .brand-stock .brand,
     .brand-stock .stock,
     .brand-stock .stock.ok,
@@ -98,12 +136,49 @@
       line-height: 1.2;
       background: #f8fbff;
     }
-    .brand-stock .oos { color: #a33; background: #fff6f6; border-color: #f0caca; }
-    .price { font-weight: 800; margin: 0; }
-    .actions { display: flex; gap: 8px; margin-top: 4px; }
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; border: 1px solid #cfe3f8; background: #f5faff; text-decoration: none; color: #0c3b66; cursor: pointer; }
-    .btn.primary { background: #188ae2; border-color: #188ae2; color: #fff; }
-    .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 8px 0 12px; }
+
+    .brand-stock .oos {
+      color: #a33;
+      background: #fff6f6;
+      border-color: #f0caca;
+    }
+
+    .price {
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #cfe3f8;
+      background: #f5faff;
+      text-decoration: none;
+      color: #0c3b66;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: #188ae2;
+      border-color: #188ae2;
+      color: #fff;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 8px 0 12px;
+    }
 
     /* ======= Vitrine (carrossel 1 item, 70% width, autoplay) ======= */
     .showcase .carousel {
@@ -114,11 +189,13 @@
       width: 70vw;
       margin: 0 auto;
     }
+
     .showcase .track {
       display: flex;
       width: 100%;
       transition: transform .4s ease;
     }
+
     .showcase .slide {
       flex: 0 0 100%;
       position: relative;
@@ -130,12 +207,14 @@
       align-items: center;
       justify-content: center;
     }
+
     .showcase .slide img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
+
     .showcase .slide.noimg::before {
       content: "\f03e";
       font-family: "Font Awesome 6 Free";
@@ -143,17 +222,18 @@
       font-size: 42px;
       color: #94a3b8;
     }
+
     .showcase .badge-price {
       position: absolute;
       right: 10px;
       bottom: 10px;
       padding: 6px 10px;
       border-radius: 10px;
-      background: rgba(24,138,226,.92);
+      background: rgba(24, 138, 226, .92);
       color: #fff;
       font-weight: 800;
       font-size: 14px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.18);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, .18);
       display: inline-flex;
       gap: 8px;
       align-items: center;
@@ -162,13 +242,19 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .showcase .badge-title { font-weight: 600; opacity: .95; }
+
+    .showcase .badge-title {
+      font-weight: 600;
+      opacity: .95;
+    }
+
     .showcase .price-line {
       text-align: right;
       font-weight: 800;
       margin: 6px 4px 0 0;
       color: #0b1f3a;
     }
+
     .showcase .controls {
       position: absolute;
       inset: 0;
@@ -178,27 +264,42 @@
       pointer-events: none;
       padding: 0 4px;
     }
+
     .showcase .ctrl {
       pointer-events: all;
       border: none;
       border-radius: 999px;
       width: 36px;
       height: 36px;
-      background: rgba(0,0,0,.35);
+      background: rgba(0, 0, 0, .35);
       color: #fff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
-  
-/* override chips menores */
-.brand-stock { display:flex; gap:4px; color:#667; align-items:center; flex-wrap:wrap; }
-.brand-stock .brand,
-.brand-stock .stock,
-.brand-stock .stock.ok,
-.brand-stock .stock.oos { border:1px solid #eef3fa; padding:1px 4px; border-radius:6px; font-size:11px; line-height:1.1; background:#f9fbff; }
-</style>
+
+    /* override chips menores */
+    .brand-stock {
+      display: flex;
+      gap: 4px;
+      color: #667;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .brand-stock .brand,
+    .brand-stock .stock,
+    .brand-stock .stock.ok,
+    .brand-stock .stock.oos {
+      border: 1px solid #eef3fa;
+      padding: 1px 4px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.1;
+      background: #f9fbff;
+    }
+  </style>
 </head>
 
 <body>
@@ -297,20 +398,20 @@
 
 
   <main class="container" id="conteudo">
-  <!-- Vitrine (dinâmico via /api/showcase.php) -->
-  <section class="showcase" aria-labelledby="show-title" style="margin-top:28px;">
-    <div class="section-title">
-      <h2 id="show-title"></h2>
-    </div>
-    <div class="carousel" id="showcaseCarousel" aria-roledescription="carousel">
-      <div class="track" id="showcaseTrack" tabindex="0" aria-label="Carrossel de vitrine"></div>
-      <div class="controls" aria-hidden="false">
-        <button class="ctrl" id="showcasePrev" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="ctrl" id="showcaseNext" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
+    <!-- Vitrine (dinâmico via /api/showcase.php) -->
+    <section class="showcase" aria-labelledby="show-title" style="margin-top:28px;">
+      <div class="section-title">
+        <h2 id="show-title"></h2>
       </div>
-    </div>
-  </section>
-<!-- Serviços -->
+      <div class="carousel" id="showcaseCarousel" aria-roledescription="carousel">
+        <div class="track" id="showcaseTrack" tabindex="0" aria-label="Carrossel de vitrine"></div>
+        <div class="controls" aria-hidden="false">
+          <button class="ctrl" id="showcasePrev" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="ctrl" id="showcaseNext" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </section>
+    <!-- Serviços -->
 
     <section class="services" aria-labelledby="srv-title">
       <h2 id="srv-title">Nossos serviços</h2>
@@ -339,7 +440,7 @@
 
 
 
-      
+
       </div>
     </section>
 
@@ -655,7 +756,10 @@
           <i class="fa-brands fa-cc-amex" title="Amex"></i>
           <i class="fa-brands fa-cc-apple-pay" title="Apple Pay"></i>
           <span class="pix">PIX</span>
-          <span class="google-safe"><a title="site 100% seguro" href="https://transparencyreport.google.com/safe-browsing/search?url=www.easyreg.com.br&hl=pt_PT" target="_blank" rel="noopener"><img src="assets/img/google-safe-browsing.webp" alt="Selo Google site seguro"></a></span>
+          <span class="google-safe"><a title="site 100% seguro"
+              href="https://transparencyreport.google.com/safe-browsing/search?url=www.easyreg.com.br&hl=pt_PT"
+              target="_blank" rel="noopener"><img src="assets/img/google-safe-browsing.webp"
+                alt="Selo Google site seguro"></a></span>
         </div>
       </section>
       <section class="footer-col">
@@ -723,17 +827,17 @@
 
   <script src="assets/js/cookie.js" defer></script>
 
-<!-- integração mínima: visitantes + cart + consent -->
-<script src="/assets/js/visitors.js" defer></script>
-<script type="module" src="/assets/js/cart.js"></script>
-<script type="module">
-  import { initCookieBanner, loadPlausibleOnConsent } from '/assets/js/utils.js';
-  initCookieBanner('.cookie-banner');
-  loadPlausibleOnConsent('SEU-DOMINIO');
-</script>
+  <!-- integração mínima: visitantes + cart + consent -->
+  <script src="/assets/js/visitors.js" defer></script>
+  <script type="module" src="/assets/js/cart.js"></script>
+  <script type="module">
+    import { initCookieBanner, loadPlausibleOnConsent } from '/assets/js/utils.js';
+    initCookieBanner('.cookie-banner');
+    loadPlausibleOnConsent('SEU-DOMINIO');
+  </script>
 
-<script type="module" src="/assets/js/shop.js"></script>
-<script defer src="/assets/js/search.js"></script>
+  <script type="module" src="/assets/js/shop.js"></script>
+  <script defer src="/assets/js/search.js"></script>
 
 </body>
 
