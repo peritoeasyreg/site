@@ -13,11 +13,24 @@ const COOKIE_DOMAIN = '.easyreg.com.br';
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 1 dia
 
 function setCookie(name, value, maxAgeSec) {
-  document.cookie = `${name}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=${maxAgeSec}; SameSite=Lax; Secure`;
+  // value já vem seguro (base64). Ainda assim, encodeURIComponent garante compatibilidade
+  document.cookie = name + '=' + encodeURIComponent(value)
+    + '; Domain=' + COOKIE_DOMAIN
+    + '; Path=/'
+    + '; Max-Age=' + maxAgeSec
+    + '; SameSite=Lax'
+    + '; Secure';
 }
 function getCookie(name) {
-  const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\\]/{}()*+?.\\\\^$|]/g,'\\$&') + '=([^;]*)'));
-  return m ? m[1] : null;
+  const parts = document.cookie ? document.cookie.split(';') : [];
+  const needle = name + '=';
+  for (let i = 0; i < parts.length; i++) {
+    const c = parts[i].trim();
+    if (c.indexOf(needle) === 0) {
+      return decodeURIComponent(c.substring(needle.length));
+    }
+  }
+  return null;
 }
 function encodeObj(obj) {
   try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); } catch { return ''; }
@@ -26,10 +39,11 @@ function decodeObj(str) {
   try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch { return null; }
 }
 
+// Migração de formatos antigos baseados em localStorage (se ainda existir)
 function migrateFromLocalStorageIfAny() {
   try {
-    const legacyIds = localStorage.getItem('cart_ids');
-    const legacyMap = localStorage.getItem('cart_map_v2');
+    const legacyIds = localStorage.getItem('cart_ids');     // array de IDs antigos
+    const legacyMap = localStorage.getItem('cart_map_v2');  // formato map antigo
     let map = null;
     if (legacyMap) {
       map = JSON.parse(legacyMap || '{}');
@@ -42,6 +56,7 @@ function migrateFromLocalStorageIfAny() {
     }
     if (map && typeof map === 'object') {
       setCookie(CART_COOKIE, encodeObj(map), COOKIE_MAX_AGE);
+      // limpa LS legado
       localStorage.removeItem('cart_ids');
       localStorage.removeItem('cart_map_v2');
     }
@@ -64,8 +79,9 @@ function saveCartMap(map) {
   setCookie(CART_COOKIE, encodeObj(map || {}), COOKIE_MAX_AGE);
 }
 
+// Estado global do carrinho
 let cartMap = loadCartMap();
-window.cartMap = () => ({ ...cartMap }); // debug/helper
+window.cartMap = () => ({ ...cartMap }); // helper
 
 /* =======================
    Util: imagens (data:)
@@ -73,7 +89,8 @@ window.cartMap = () => ({ ...cartMap }); // debug/helper
 function normalizeImageSrc(src) {
   if (!src) return '';
   if (/^data:/i.test(src)) return src;
-  if (/^(https?:)?\/\//i.test(src) || src.startsWith('https://')) return src;
+  if (/^(https?:)?\/\//i.test(src)) return src;
+  // base64 crua
   if (/^[A-Za-z0-9+/=]+$/.test(src) && src.length > 100) return 'data:image/jpeg;base64,' + src;
   return src;
 }
@@ -149,14 +166,14 @@ function lockBodyScroll(lock) {
   }
 }
 function escapeHtml(s) {
-  return s.replace(/[&<>\"']/g, (m) => ({
+  return String(s || '').replace(/[&<>\"']/g, (m) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[m]));
 }
 function buildImagesArray(p) {
-  const cover = p?.image ? [p.image] : [];
-  const extra = Array.isArray(p?.images) ? p.images.filter(Boolean) : [];
-  const all = [...cover, ...extra].filter(Boolean);
+  const cover = p && p.image ? [p.image] : [];
+  const extra = Array.isArray(p && p.images) ? p.images.filter(Boolean) : [];
+  const all = cover.concat(extra).filter(Boolean);
   return all.length ? all : [''];
 }
 
@@ -237,8 +254,8 @@ let __ALL_SHOWCASE = [];
 
 function findProductById(id) {
   if (!id) return null;
-  return (__ALL_PRODUCTS.find(p => (p.id ?? '') === id) ||
-          __ALL_SHOWCASE.find(p => (p.id ?? '') === id)) || null;
+  return (__ALL_PRODUCTS.find(p => (p.id || '') === id) ||
+          __ALL_SHOWCASE.find(p => (p.id || '') === id)) || null;
 }
 function getStockFor(id) {
   const p = findProductById(id);
@@ -250,12 +267,12 @@ function getPriceFor(id) {
 }
 function getCoverFor(id) {
   const p = findProductById(id);
-  const src = p?.image || (Array.isArray(p?.images) ? p.images[0] : '');
+  const src = (p && p.image) ? p.image : (Array.isArray(p && p.images) ? p.images[0] : '');
   return normalizeImageSrc(src || '');
 }
 function getTitleFor(id) {
   const p = findProductById(id);
-  return p?.title || 'Item';
+  return (p && p.title) ? p.title : 'Item';
 }
 
 /* ===================================
@@ -331,51 +348,52 @@ function renderCartPanel() {
     const qty = cartMap[id] || 0;
     const price = getPriceFor(id);
     const subtotal = BRL.format(price * qty);
-    return `
-      <div class="cart-item" data-id="${id}">
-        <img src="${img || ''}" alt="">
-        <div>
-          <div class="ci-title">${title}</div>
-          <div class="ci-meta">${BRL.format(price)} &middot; Subtotal: ${subtotal}</div>
-        </div>
-        <div class="ci-actions">
-          <div class="qtybox">
-            <button class="ci-sub" aria-label="Diminuir">−</button>
-            <input class="ci-input" type="number" min="0" step="1" value="${qty}">
-            <button class="ci-add" aria-label="Aumentar">+</button>
-          </div>
-          <button class="btn muted ci-rem">Remover</button>
-        </div>
-      </div>
-    `;
+    return (
+      '<div class="cart-item" data-id="' + id + '">' +
+        (img ? '<img src="' + img + '" alt="">' : '<img src="" alt="">') +
+        '<div>' +
+          '<div class="ci-title">' + title + '</div>' +
+          '<div class="ci-meta">' + BRL.format(price) + ' &middot; Subtotal: ' + subtotal + '</div>' +
+        '</div>' +
+        '<div class="ci-actions">' +
+          '<div class="qtybox">' +
+            '<button class="ci-sub" aria-label="Diminuir">−</button>' +
+            '<input class="ci-input" type="number" min="0" step="1" value="' + qty + '">' +
+            '<button class="ci-add" aria-label="Aumentar">+</button>' +
+          '</div>' +
+          '<button class="btn muted ci-rem">Remover</button>' +
+        '</div>' +
+      '</div>'
+    );
   }).join('');
 
-  __CART_ROOT.innerHTML = `
-    <div class="cart-card">
-      <div class="cart-head">
-        <h3>Seu Carrinho (${cartCount()} itens)</h3>
-        <button class="btn muted" id="cart-clear">Limpar</button>
-      </div>
-      <div class="cart-body">
-        ${itemsHtml || '<div class="cart-empty">Nenhum item adicionado.</div>'}
-      </div>
-      <div class="cart-foot">
-        <div class="cart-total">Total: ${BRL.format(cartTotal())}</div>
-        <a class="btn-checkout" href="/checkout.html">Checkout</a>
-      </div>
-    </div>
-  `;
+  __CART_ROOT.innerHTML = [
+    '<div class="cart-card">',
+      '<div class="cart-head">',
+        '<h3>Seu Carrinho (' + cartCount() + ' itens)</h3>',
+        '<button class="btn muted" id="cart-clear">Limpar</button>',
+      '</div>',
+      '<div class="cart-body">',
+        itemsHtml || '<div class="cart-empty">Nenhum item adicionado.</div>',
+      '</div>',
+      '<div class="cart-foot">',
+        '<div class="cart-total">Total: ' + BRL.format(cartTotal()) + '</div>',
+        '<a class="btn-checkout" href="/checkout.html">Checkout</a>',
+      '</div>',
+    '</div>'
+  ].join('');
 
   __CART_ROOT.querySelectorAll('.cart-item').forEach(row => {
     const id = row.getAttribute('data-id');
-    row.querySelector('.ci-add')?.addEventListener('click', () => addOne(id));
-    row.querySelector('.ci-sub')?.addEventListener('click', () => subOne(id));
-    row.querySelector('.ci-rem')?.addEventListener('click', () => removeAll(id));
+    row.querySelector('.ci-add') && row.querySelector('.ci-add').addEventListener('click', () => addOne(id));
+    row.querySelector('.ci-sub') && row.querySelector('.ci-sub').addEventListener('click', () => subOne(id));
+    row.querySelector('.ci-rem') && row.querySelector('.ci-rem').addEventListener('click', () => removeAll(id));
     const input = row.querySelector('.ci-input');
-    input?.addEventListener('change', () => setQty(id, input.value));
+    input && input.addEventListener('change', () => setQty(id, input.value));
   });
 
-  __CART_ROOT.querySelector('#cart-clear')?.addEventListener('click', () => {
+  const clearBtn = __CART_ROOT.querySelector('#cart-clear');
+  clearBtn && clearBtn.addEventListener('click', () => {
     cartMap = {};
     saveCartMap(cartMap);
     syncUiAfterCartChange();
@@ -391,15 +409,15 @@ function updateBuyButton(btn, id) {
   if (q > 0) {
     btn.classList.remove('primary');
     btn.classList.add('success');
-    btn.innerHTML = `Adicionar (${q})`;
+    btn.innerHTML = 'Adicionar (' + q + ')';
   } else {
     btn.classList.remove('success');
     btn.classList.add('primary');
-    btn.innerHTML = `<i class="fa-solid fa-cart-plus"></i> Adicionar`;
+    btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Adicionar';
   }
 }
 function updateAllGridButtonsFor(id) {
-  document.querySelectorAll(`.product[data-id="${id}"] .actions .buy`).forEach(btn => updateBuyButton(btn, id));
+  document.querySelectorAll('.product[data-id="' + id + '"] .actions .buy').forEach(btn => updateBuyButton(btn, id));
 }
 function updateModalControls(root, id) {
   if (!root) return;
@@ -412,11 +430,11 @@ function updateModalControls(root, id) {
     if (q > 0) {
       addBtn.classList.remove('primary');
       addBtn.classList.add('success');
-      addBtn.innerHTML = `<i class="fa-solid fa-check"></i> Adicionar`;
+      addBtn.innerHTML = '<i class="fa-solid fa-check"></i> Adicionar';
     } else {
       addBtn.classList.remove('success');
       addBtn.classList.add('primary');
-      addBtn.innerHTML = `<i class="fa-solid fa-cart-plus"></i> Adicionar`;
+      addBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Adicionar';
     }
   }
   if (input) input.value = q;
@@ -426,61 +444,73 @@ function updateModalControls(root, id) {
    Modal (template + controle)
 =================================== */
 function modalTemplate(p, images) {
-  const priceStr = p?.currency === 'BRL' ? BRL.format(+p?.price || 0) : (p?.price ?? '');
-  const title = p?.title || 'Produto';
-  const brand = p?.brand || '';
-  const stock = (typeof p?.stock === 'number') ? p.stock : null;
-  const id = p?.id ?? '';
-  const sku = p?.sku ?? '';
-  const description = (p?.description || '').toString();
+  const priceStr = p && p.currency === 'BRL' ? BRL.format(+p.price || 0) : (p && p.price ? String(p.price) : '');
+  const title = (p && p.title) ? p.title : 'Produto';
+  const brand = (p && p.brand) ? p.brand : '';
+  const stock = (p && typeof p.stock === 'number') ? p.stock : null;
+  const id = (p && p.id) ? p.id : '';
+  const sku = (p && p.sku) ? p.sku : '';
+  const description = (p && p.description ? String(p.description) : '');
 
-  return `
-  <div class="pe-modal-overlay" role="dialog" aria-modal="true" aria-label="${title}">
-    <div class="pe-modal">
-      <button class="pe-close" aria-label="Fechar modal">&times;</button>
-      <div class="pe-modal-grid">
-        <div class="pe-gallery">
-          <div class="pe-viewport">
-            <div class="pe-track">
-              ${images.map((src, i) => `
-                <div class="pe-slide${src ? '' : ' noimg'}">
-                  ${src ? `<img src="${normalizeImageSrc(src)}" alt="${title} - ${i+1}" onerror="this.closest('.pe-slide').classList.add('noimg');this.style.display='none'">` : ''}
-                </div>
-              `).join('')}
-            </div>
-            <button class="pe-nav pe-prev" aria-label="Anterior">&#10094;</button>
-            <button class="pe-nav pe-next" aria-label="Próximo">&#10095;</button>
-          </div>
-          <div class="pe-dots" role="tablist" aria-label="Navegação de imagens"></div>
+  return [
+  '<div class="pe-modal-overlay" role="dialog" aria-modal="true" aria-label="', escapeHtml(title),'">',
+    '<div class="pe-modal">',
+      '<button class="pe-close" aria-label="Fechar modal">&times;</button>',
+      '<div class="pe-modal-grid">',
+        '<div class="pe-gallery">',
+          '<div class="pe-viewport">',
+            '<div class="pe-track">',
+              images.map(function(src, i){
+                return [
+                  '<div class="pe-slide', (src ? '' : ' noimg'),'">',
+                    images.map((src, i) => {
+    const slideClass = src ? '' : ' noimg';
+    const altText = escapeHtml(title) + ' - ' + (i + 1);
+    const imgSrc = normalizeImageSrc(src);
+
+    return `
+        <div class="pe-slide${slideClass}">
+            ${src ? `<img src="${imgSrc}" alt="${altText}" onerror="this.closest('.pe-slide').classList.add('noimg');this.style.display='none'">` : ''}
         </div>
+    `;
+}).join(''),
+                  '</div>'
+                ].join('');
+              }).join(''),
+            '</div>',
+            '<button class="pe-nav pe-prev" aria-label="Anterior">&#10094;</button>',
+            '<button class="pe-nav pe-next" aria-label="Próximo">&#10095;</button>',
+          '</div>',
+          '<div class="pe-dots" role="tablist" aria-label="Navegação de imagens"></div>',
+        '</div>',
 
-        <div class="pe-details" data-id="${id}">
-          <h1 class="pe-title">${title}</h1>
-          ${sku ? `<p class="pe-sub">SKU: <span class="pe-code">${sku}</span></p>` : (id ? `<p class="pe-sub">ID: <span class="pe-code">${id}</span></p>` : '')}
-          ${priceStr ? `<p class="pe-price">${priceStr}</p>` : ''}
+        '<div class="pe-details" data-id="', escapeHtml(id),'">',
+          '<h1 class="pe-title">', escapeHtml(title),'</h1>',
+          (sku ? '<p class="pe-sub">SKU: <span class="pe-code">'+ escapeHtml(sku) +'</span></p>' : (id ? '<p class="pe-sub">ID: <span class="pe-code">'+ escapeHtml(id) +'</span></p>' : '')),
+          (priceStr ? '<p class="pe-price">'+ priceStr +'</p>' : ''),
 
-          <dl class="pe-dl">
-            ${brand ? `<div class="pe-row"><dt>Marca:</dt><dd>${brand}</dd></div>` : ''}
-            ${stock !== null ? `<div class="pe-row"><dt>Estoque:</dt><dd>${stock > 0 ? `${stock} un.` : 'Indisponível'}</dd></div>` : ''}
-          </dl>
+          '<dl class="pe-dl">',
+            (brand ? '<div class="pe-row"><dt>Marca:</dt><dd>'+ escapeHtml(brand) +'</dd></div>' : ''),
+            (stock !== null ? '<div class="pe-row"><dt>Estoque:</dt><dd>'+ (stock > 0 ? (stock + ' un.') : 'Indisponível') +'</dd></div>' : ''),
+          '</dl>',
 
-          ${description ? `<div class="pe-desc"><h2>Descrição</h2><p>${escapeHtml(description).replace(/\\n/g, '<br>')}</p></div>` : ''}
+          (description ? '<div class="pe-desc"><h2>Descrição</h2><p>'+ escapeHtml(description).replace(/\n/g,'<br>') +'</p></div>' : ''),
 
-          <div class="pe-actions">
-            <div class="qtybox">
-              <button class="pe-sub" aria-label="Diminuir">−</button>
-              <input class="pe-qty-input" type="number" min="0" step="1" value="0">
-              <button class="pe-add1" aria-label="Aumentar">+</button>
-            </div>
-            <button class="btn primary pe-add">Adicionar</button>
-            <button class="btn muted pe-remall">Remover item do Carrinho</button>
-            <button class="btn muted pe-close-inline">Fechar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  `;
+          '<div class="pe-actions">',
+            '<div class="qtybox">',
+              '<button class="pe-sub" aria-label="Diminuir">−</button>',
+              '<input class="pe-qty-input" type="number" min="0" step="1" value="0">',
+              '<button class="pe-add1" aria-label="Aumentar">+</button>',
+            '</div>',
+            '<button class="btn primary pe-add">Adicionar</button>',
+            '<button class="btn muted pe-remall">Remover item do Carrinho</button>',
+            '<button class="btn muted pe-close-inline">Fechar</button>',
+          '</div>',
+        '</div>',
+      '</div>',
+    '</div>',
+  '</div>'
+  ].join('');
 }
 
 function openProductModal(p) {
@@ -489,19 +519,21 @@ function openProductModal(p) {
 
   const images = buildImagesArray(p);
   __MODAL_ROOT.innerHTML = modalTemplate(p, images);
-  
-  __MODAL_ROOT.addEventListener('click', (e) => {
-    const t = e.target;
-    if (t.closest('.pe-sub'))   { subOne(id); return; }
-    if (t.closest('.pe-remall')){ removeAll(id); return; }
-    if (t.closest('.pe-close') || t.closest('.pe-close-inline')) { close(); return; }
-  });
 
   const overlay = __MODAL_ROOT.querySelector('.pe-modal-overlay');
   const btnClose = __MODAL_ROOT.querySelector('.pe-close');
   const details = __MODAL_ROOT.querySelector('.pe-details');
-  const id = details?.getAttribute('data-id') || p?.id || '';
+  const id = details ? details.getAttribute('data-id') : (p && p.id) ? p.id : '';
 
+  // Delegação de eventos dentro do modal
+  __MODAL_ROOT.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.closest && t.closest('.pe-sub'))   { subOne(id); return; }
+    if (t.closest && t.closest('.pe-remall')){ removeAll(id); return; }
+    if (t.closest && (t.closest('.pe-close') || t.closest('.pe-close-inline'))) { close(); return; }
+  });
+
+  // Carrossel
   const track = __MODAL_ROOT.querySelector('.pe-track');
   const dotsWrap = __MODAL_ROOT.querySelector('.pe-dots');
   const prev = __MODAL_ROOT.querySelector('.pe-prev');
@@ -509,46 +541,48 @@ function openProductModal(p) {
   let index = 0;
   const total = images.length;
   function updateCarousel() {
-    track.style.transform = `translateX(-${index * 100}%)`;
-    dotsWrap.querySelectorAll('button').forEach((b, i) =>
+    if (track) track.style.transform = 'translateX(-' + (index * 100) + '%)';
+    if (dotsWrap) dotsWrap.querySelectorAll('button').forEach((b, i) =>
       b.setAttribute('aria-current', i === index ? 'true' : 'false'));
   }
   function go(i) { index = (i + total) % total; updateCarousel(); }
-  dotsWrap.innerHTML = images.map((_, i) => `<button aria-label="Ir para imagem ${i + 1}"></button>`).join('');
-  dotsWrap.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => go(i)));
-  prev.addEventListener('click', () => go(index - 1));
-  next.addEventListener('click', () => go(index + 1));
+  if (dotsWrap) {
+    dotsWrap.innerHTML = images.map(() => '<button aria-label="Ir para imagem"></button>').join('');
+    dotsWrap.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => go(i)));
+  }
+  prev && prev.addEventListener('click', () => go(index - 1));
+  next && next.addEventListener('click', () => go(index + 1));
   const viewport = __MODAL_ROOT.querySelector('.pe-viewport');
   let sx = 0, dx = 0;
-  viewport.addEventListener('touchstart', e => { sx = e.touches[0].clientX; dx = 0; }, { passive: true });
-  viewport.addEventListener('touchmove', e => { dx = e.touches[0].clientX - sx; }, { passive: true });
-  viewport.addEventListener('touchend', () => { if (Math.abs(dx) > 40) { dx < 0 ? go(index + 1) : go(index - 1); } });
+  viewport && viewport.addEventListener('touchstart', e => { sx = e.touches[0].clientX; dx = 0; }, { passive: true });
+  viewport && viewport.addEventListener('touchmove', e => { dx = e.touches[0].clientX - sx; }, { passive: true });
+  viewport && viewport.addEventListener('touchend', () => { if (Math.abs(dx) > 40) { dx < 0 ? go(index + 1) : go(index - 1); } });
 
+  // Ações carrinho no modal
   const btnAdd = __MODAL_ROOT.querySelector('.pe-add');
   const btnAdd1 = __MODAL_ROOT.querySelector('.pe-add1');
   const btnSub1 = __MODAL_ROOT.querySelector('.pe-sub');
   const btnRemAll = __MODAL_ROOT.querySelector('.pe-remall');
   const input = __MODAL_ROOT.querySelector('.pe-qty-input');
-  input.addEventListener('change', () => setQty(id, input.value));
+  input && input.addEventListener('change', () => setQty(id, input.value));
 
-  btnAdd.addEventListener('click', () => addOne(id));
-  btnAdd1.addEventListener('click', () => addOne(id));
-  btnSub1.addEventListener('click', () => subOne(id));
-  btnRemAll.addEventListener('click', () => removeAll(id));
-  input.addEventListener('change', () => setQty(id, input.value));
+  btnAdd && btnAdd.addEventListener('click', () => addOne(id));
+  btnAdd1 && btnAdd1.addEventListener('click', () => addOne(id));
+  btnSub1 && btnSub1.addEventListener('click', () => subOne(id));
+  btnRemAll && btnRemAll.addEventListener('click', () => removeAll(id));
 
   function close() {
     lockBodyScroll(false);
     if (overlay && overlay.parentNode) overlay.parentNode.innerHTML = '';
   }
-  btnClose.addEventListener('click', close);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  btnClose && btnClose.addEventListener('click', close);
+  overlay && overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', function onEsc(ev) {
     if (ev.key === 'Escape') { document.removeEventListener('keydown', onEsc); close(); }
   });
 
   lockBodyScroll(true);
-  setTimeout(() => btnClose?.focus?.(), 0);
+  setTimeout(() => { if (btnClose && btnClose.focus) btnClose.focus(); }, 0);
   updateCarousel();
   updateModalControls(__MODAL_ROOT, id);
 }
@@ -557,54 +591,56 @@ function openProductModal(p) {
    Grid de produtos (cards)
 =================================== */
 function productCard(p) {
-  const id = p?.id ?? '';
-  const title = p?.title ?? 'Produto';
-  const brand = p?.brand ?? '';
-  const price = typeof p?.price === 'number' ? p.price : 0;
-  const currency = p?.currency ?? 'BRL';
-  const stock = typeof p?.stock === 'number' ? p.stock : 0;
-  const image = p?.image ?? '';
-  const url = p?.url ?? '#';
+  const id = (p && p.id) ? p.id : '';
+  const title = (p && p.title) ? p.title : 'Produto';
+  const brand = (p && p.brand) ? p.brand : '';
+  const price = (p && typeof p.price === 'number') ? p.price : 0;
+  const currency = (p && p.currency) ? p.currency : 'BRL';
+  const stock = (p && typeof p.stock === 'number') ? p.stock : 0;
+  const image = (p && p.image) ? p.image : '';
+  const url = (p && p.url) ? p.url : '#';
   const imgSrc = normalizeImageSrc(image);
-  const priceStr = currency === 'BRL' ? BRL.format(price) : `${price}`;
+  const priceStr = currency === 'BRL' ? BRL.format(price) : String(price);
 
-  return `
-    <article class="product" data-id="${id}">
-      <div class="media" role="button" tabindex="0" aria-label="Abrir ${title}">
-        ${imgSrc ? `<img src="${imgSrc}" alt="${title}" onerror="handleImgError(this)">` : `<img src="" alt="" onerror="handleImgError(this)" />`}
-      </div>
-      <div class="info">
-        <h3>${title}</h3>
-        <div class="brand-stock">
-          ${brand ? `<small class="brand">${brand}</small>` : ''}
-          ${stock > 0 ? `<small class="stock">Em estoque: ${stock} un.</small>` : `<small class="stock oos">Sem estoque</small>`}
-        </div>
-        <div class="price">${priceStr}</div>
-        <div class="actions">
-          <a class="btn see" href="${url}" aria-label="Ver detalhes de ${title}"><i class="fa-solid fa-eye"></i>Detalhes</a>
-          <button class="btn primary buy" type="button" aria-label="Adicionar ${title}"><i class="fa-solid fa-cart-plus"></i> Adicionar</button>
-        </div>
-      </div>
-    </article>
-  `;
+  return [
+    '<article class="product" data-id="', escapeHtml(id),'">',
+      '<div class="media" role="button" tabindex="0" aria-label="Abrir ', escapeHtml(title),'">',
+        (imgSrc ? '<img src="'+ imgSrc +'" alt="'+ escapeHtml(title) +'" onerror="handleImgError(this)">' : '<img src="" alt="" onerror="handleImgError(this)">'),
+      '</div>',
+      '<div class="info">',
+        '<h3>', escapeHtml(title),'</h3>',
+        '<div class="brand-stock">',
+          (brand ? '<small class="brand">'+ escapeHtml(brand) +'</small>' : ''),
+          (stock > 0 ? '<small class="stock">Em estoque: '+ stock +' un.</small>' : '<small class="stock oos">Sem estoque</small>'),
+        '</div>',
+        '<div class="price">', priceStr ,'</div>',
+        '<div class="actions">',
+          '<a class="btn see" href="', url ,'" aria-label="Ver detalhes de ', escapeHtml(title),'"><i class="fa-solid fa-eye"></i>Detalhes</a>',
+          '<button class="btn primary buy" type="button" aria-label="Adicionar ', escapeHtml(title),'"><i class="fa-solid fa-cart-plus"></i> Adicionar</button>',
+        '</div>',
+      '</div>',
+    '</article>'
+  ].join('');
 }
 
 function renderProducts(items, container) {
   if (!Array.isArray(items) || !container) return;
   container.innerHTML = items.map(productCard).join('');
 
+  // Botões + eventos
   container.querySelectorAll('button.buy').forEach(btn => {
     const card = btn.closest('.product');
-    const id = card?.dataset?.id;
+    const id = card ? card.getAttribute('data-id') : null;
     updateBuyButton(btn, id);
     btn.addEventListener('click', () => addOne(id));
   });
 
+  // Modal pela imagem/card ou botão "Ver"
   function findProductFromTarget(target) {
     const card = target.closest('.product');
     if (!card) return null;
-    const id = card.dataset.id;
-    return __ALL_PRODUCTS.find(p => (p.id ?? '') === id) || null;
+    const id = card.getAttribute('data-id');
+    return __ALL_PRODUCTS.find(p => (p.id || '') === id) || null;
   }
 
   container.querySelectorAll('.product .media, .product .actions .see').forEach(el => {
@@ -635,19 +671,19 @@ function renderProducts(items, container) {
    Vitrine (carrossel)
 =================================== */
 function slideTemplate(item) {
-  const priceStr = item?.currency === 'BRL' ? BRL.format(+item?.price || 0) : `${item?.price ?? ''}`;
-  const raw = item?.image || '';
+  const priceStr = item && item.currency === 'BRL' ? BRL.format(+item.price || 0) : String(item && item.price ? item.price : '');
+  const raw = item && item.image ? item.image : '';
   const imgSrc = normalizeImageSrc(raw);
-  const alt = item?.title || 'Vitrine';
-  const title = item?.title || '';
-  const idAttr = item?.id ? ` data-id="${item.id}"` : '';
+  const alt = item && item.title ? item.title : 'Vitrine';
+  const title = item && item.title ? item.title : '';
+  const idAttr = item && item.id ? ' data-id="' + item.id + '"' : '';
 
-  return `
-    <div class="slide${imgSrc ? '' : ' noimg'}" role="button" tabindex="0" aria-label="Abrir ${title}"${idAttr}>
-      ${imgSrc ? `<img src="${imgSrc}" alt="${alt}" onerror="this.closest('.slide').classList.add('noimg'); this.style.display='none'">` : ''}
-      <span class="badge-price"><span class="bp-title">${title}</span> ${priceStr}</span>
-    </div>
-  `;
+  return [
+    '<div class="slide', (imgSrc ? '' : ' noimg'),'" role="button" tabindex="0" aria-label="Abrir ', escapeHtml(title),'"', idAttr,'>',
+      (imgSrc ? '<img src="'+ imgSrc +'" alt="'+ escapeHtml(alt) +'" onerror="this.closest(\'.slide\').classList.add(\'noimg\'); this.style.display=\'none\'">' : ''),
+      '<span class="badge-price"><span class="bp-title">', escapeHtml(title),'</span> ', priceStr ,'</span>',
+    '</div>'
+  ].join('');
 }
 
 function initShowcaseCarousel(items) {
@@ -660,30 +696,30 @@ function initShowcaseCarousel(items) {
   const total = items.length;
   function stepTo(i) {
     index = (i + total) % total;
-    track.style.transform = `translateX(-${index * 100}%)`;
+    track.style.transform = 'translateX(-' + (index * 100) + '%)';
   }
 
   const prev = document.getElementById('showcasePrev');
   const next = document.getElementById('showcaseNext');
-  prev?.addEventListener('click', () => stepTo(index - 1));
-  next?.addEventListener('click', () => stepTo(index + 1));
+  prev && prev.addEventListener('click', () => stepTo(index - 1));
+  next && next.addEventListener('click', () => stepTo(index + 1));
 
   let timer = setInterval(() => stepTo(index + 1), 2000);
   const pause = () => { clearInterval(timer); };
   const resume = () => { clearInterval(timer); timer = setInterval(() => stepTo(index + 1), 2000); };
   track.addEventListener('mouseenter', pause);
   track.addEventListener('mouseleave', resume);
-  prev?.addEventListener('mouseenter', pause);
-  next?.addEventListener('mouseenter', pause);
-  prev?.addEventListener('mouseleave', resume);
-  next?.addEventListener('mouseleave', resume);
+  prev && prev.addEventListener('mouseenter', pause);
+  next && next.addEventListener('mouseenter', pause);
+  prev && prev.addEventListener('mouseleave', resume);
+  next && next.addEventListener('mouseleave', resume);
 
   function findShowcaseItemFromEl(el) {
     const id = el.getAttribute('data-id');
-    if (id) return __ALL_SHOWCASE.find(s => (s.id ?? '') === id) || null;
-    const tt = el.querySelector('.bp-title')?.textContent?.trim();
+    if (id) return __ALL_SHOWCASE.find(s => (s.id || '') === id) || null;
+    const tt = el.querySelector('.bp-title') ? el.querySelector('.bp-title').textContent.trim() : '';
     if (!tt) return null;
-    return __ALL_SHOWCASE.find(s => (s.title ?? '').trim() === tt) || null;
+    return __ALL_SHOWCASE.find(s => (s.title || '').trim() === tt) || null;
   }
   track.querySelectorAll('.slide').forEach(slide => {
     slide.addEventListener('click', () => {
@@ -727,22 +763,26 @@ function syncUiAfterCartChange(idsToRefresh) {
 async function initShop() {
   injectGlobalStylesOnce();
 
+  // Produtos (cards) — ajuste os endpoints se necessário
   const productsGrid = document.getElementById('productsGrid') || document.querySelector('.featured .grid');
   if (productsGrid) {
     __ALL_PRODUCTS = await fetchJsonArray('https://checkout.easyreg.com.br/products.php');
     if (__ALL_PRODUCTS.length) renderProducts(__ALL_PRODUCTS, productsGrid);
   }
 
+  // Vitrine (carrossel)
   const showcaseEl = document.getElementById('showcaseTrack');
   if (showcaseEl) {
     __ALL_SHOWCASE = await fetchJsonArray('https://checkout.easyreg.com.br/showcase.php');
     if (__ALL_SHOWCASE.length) initShowcaseCarousel(__ALL_SHOWCASE);
   }
 
+  // Render inicial do painel de carrinho
   renderCartPanel();
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initShop);
 else initShop();
 
+// Global para onerror inline
 window.handleImgError = handleImgError;
