@@ -730,14 +730,14 @@ async function initShop() {
   // Produtos (cards)
   const productsGrid = document.getElementById('productsGrid') || document.querySelector('.featured .grid');
   if (productsGrid) {
-    __ALL_PRODUCTS = await fetchJsonArray('https://easyreg.smartzeus.com.br/products.php');
+    __ALL_PRODUCTS = await fetchJsonArray('https://checkout.easyreg.com.br/products.php');
     if (__ALL_PRODUCTS.length) renderProducts(__ALL_PRODUCTS, productsGrid);
   }
 
   // Vitrine (carrossel)
   const showcaseEl = document.getElementById('showcaseTrack');
   if (showcaseEl) {
-    __ALL_SHOWCASE = await fetchJsonArray('https://easyreg.smartzeus.com.br/showcase.php');
+    __ALL_SHOWCASE = await fetchJsonArray('https://checkout.easyreg.com.br/showcase.php');
     if (__ALL_SHOWCASE.length) initShowcaseCarousel(__ALL_SHOWCASE);
   }
 
