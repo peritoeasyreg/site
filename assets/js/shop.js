@@ -1,3 +1,69 @@
+// ===== Cart Bridge p/ compartilhar carrinho entre subdomínios =====
+(function () {
+  const CART_LS_KEY = 'cart_map';
+  const CART_COOKIE = 'er_cart_v1';
+  const COOKIE_DOMAIN = '.easyreg.com.br';
+
+  function setCookie(name, value, maxAgeSec) {
+    // SameSite=Lax evita bloqueio comum e ainda permite navegação entre domínios
+    document.cookie = `${name}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=${maxAgeSec}; SameSite=Lax`;
+  }
+  function getCookie(name) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]/{}()*+?.\\^$|]/g,'\\$&') + '=([^;]*)'));
+    return m ? m[1] : null;
+  }
+  function encodeObj(obj) {
+    try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); } catch (e) { return ''; }
+  }
+  function decodeObj(str) {
+    try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch (e) { return null; }
+  }
+
+  function readCartLS() {
+    try { return JSON.parse(localStorage.getItem(CART_LS_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function writeCartLS(obj) {
+    localStorage.setItem(CART_LS_KEY, JSON.stringify(obj));
+  }
+
+  // Espelha mudanças do LS -> Cookie (monkey-patch no mesmo TAB)
+  const _setItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function (k, v) {
+    _setItem(k, v);
+    if (k === CART_LS_KEY) {
+      try {
+        const parsed = JSON.parse(v || '{}');
+        // cookie ~4KB máx: se seu carrinho puder ficar maior, considere token+servidor
+        setCookie(CART_COOKIE, encodeObj(parsed), 60 * 60 * 24); // 1 dia
+      } catch (e) {}
+    }
+  };
+
+  // Ao carregar: se LS estiver vazio aqui, tenta hidratar a partir do cookie compartilhado
+  (function hydrateFromCookieIfNeeded() {
+    const lsEmpty = Object.keys(readCartLS()).length === 0;
+    const cval = getCookie(CART_COOKIE);
+    if (lsEmpty && cval) {
+      const obj = decodeObj(cval);
+      if (obj && typeof obj === 'object') {
+        writeCartLS(obj);
+        // avisa eventuais listeners que o carrinho mudou
+        window.dispatchEvent(new StorageEvent('storage', { key: CART_LS_KEY, newValue: JSON.stringify(obj) }));
+      }
+    }
+  })();
+
+  // Se o carrinho já existir no LS desta origem, garanta que o cookie também esteja atualizado
+  try {
+    const nowCart = readCartLS();
+    if (nowCart && typeof nowCart === 'object') {
+      setCookie(CART_COOKIE, encodeObj(nowCart), 60 * 60 * 24);
+    }
+  } catch (e) {}
+})();
+
+
+// --- Start --- 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 /* ======================
