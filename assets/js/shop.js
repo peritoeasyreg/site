@@ -1,103 +1,67 @@
-// ===== Cart Bridge p/ compartilhar carrinho entre subdom�nios =====
-(function () {
-  const CART_LS_KEY = 'cart_map';
-  const CART_COOKIE = 'er_cart_v1';
-  const COOKIE_DOMAIN = '.easyreg.com.br';
+// === EasyReg Shop (cookie-based cart) ===
+// Cart persisted ONLY in cookie (shared across subdomains).
+// Domain: .easyreg.com.br, SameSite=Lax, Secure
 
-  function setCookie(name, value, maxAgeSec) {
-    // SameSite=Lax evita bloqueio comum e ainda permite navega��o entre dom�nios
-    document.cookie = `${name}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=${maxAgeSec}; SameSite=Lax`;
-  }
-  function getCookie(name) {
-    const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]/{}()*+?.\\^$|]/g,'\\$&') + '=([^;]*)'));
-    return m ? m[1] : null;
-  }
-  function encodeObj(obj) {
-    try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); } catch (e) { return ''; }
-  }
-  function decodeObj(str) {
-    try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch (e) { return null; }
-  }
-
-  function readCartLS() {
-    try { return JSON.parse(localStorage.getItem(CART_LS_KEY) || '{}'); } catch (e) { return {}; }
-  }
-  function writeCartLS(obj) {
-    localStorage.setItem(CART_LS_KEY, JSON.stringify(obj));
-  }
-
-  // Espelha mudan�as do LS -> Cookie (monkey-patch no mesmo TAB)
-  const _setItem = localStorage.setItem.bind(localStorage);
-  localStorage.setItem = function (k, v) {
-    _setItem(k, v);
-    if (k === CART_LS_KEY) {
-      try {
-        const parsed = JSON.parse(v || '{}');
-        // cookie ~4KB m�x: se seu carrinho puder ficar maior, considere token+servidor
-        setCookie(CART_COOKIE, encodeObj(parsed), 60 * 60 * 24); // 1 dia
-      } catch (e) {}
-    }
-  };
-
-  // Ao carregar: se LS estiver vazio aqui, tenta hidratar a partir do cookie compartilhado
-  (function hydrateFromCookieIfNeeded() {
-    const lsEmpty = Object.keys(readCartLS()).length === 0;
-    const cval = getCookie(CART_COOKIE);
-    if (lsEmpty && cval) {
-      const obj = decodeObj(cval);
-      if (obj && typeof obj === 'object') {
-        writeCartLS(obj);
-        // avisa eventuais listeners que o carrinho mudou
-        window.dispatchEvent(new StorageEvent('storage', { key: CART_LS_KEY, newValue: JSON.stringify(obj) }));
-      }
-    }
-  })();
-
-  // Se o carrinho j� existir no LS desta origem, garanta que o cookie tamb�m esteja atualizado
-  try {
-    const nowCart = readCartLS();
-    if (nowCart && typeof nowCart === 'object') {
-      setCookie(CART_COOKIE, encodeObj(nowCart), 60 * 60 * 24);
-    }
-  } catch (e) {}
-})();
-
-
-// --- Start --- 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 /* ======================
-   Estado de carrinho
+   Cart persistence via Cookie
    (armazenado como { [id]: qty })
 ====================== */
-const CART_KEY = 'cart_map_v2';
+const CART_COOKIE = 'er_cart_v2';
+const COOKIE_DOMAIN = '.easyreg.com.br';
+const COOKIE_MAX_AGE = 60 * 60 * 24; // 1 dia
 
-// migração de versões antigas (array de ids)
-function migrateOldCartFormat() {
+function setCookie(name, value, maxAgeSec) {
+  document.cookie = `${name}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; Max-Age=${maxAgeSec}; SameSite=Lax; Secure`;
+}
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\\]/{}()*+?.\\\\^$|]/g,'\\$&') + '=([^;]*)'));
+  return m ? m[1] : null;
+}
+function encodeObj(obj) {
+  try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); } catch { return ''; }
+}
+function decodeObj(str) {
+  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); } catch { return null; }
+}
+
+function migrateFromLocalStorageIfAny() {
   try {
-    const legacy = localStorage.getItem('cart_ids');
-    const cur = localStorage.getItem(CART_KEY);
-    if (cur || !legacy) return;
-    const arr = JSON.parse(legacy || '[]');
-    const map = {};
-    if (Array.isArray(arr)) {
-      arr.forEach(id => { if (id) map[id] = (map[id] || 0) + 1; });
+    const legacyIds = localStorage.getItem('cart_ids');
+    const legacyMap = localStorage.getItem('cart_map_v2');
+    let map = null;
+    if (legacyMap) {
+      map = JSON.parse(legacyMap || '{}');
+    } else if (legacyIds) {
+      const arr = JSON.parse(legacyIds || '[]');
+      map = {};
+      if (Array.isArray(arr)) {
+        arr.forEach(id => { if (id) map[id] = (map[id] || 0) + 1; });
+      }
     }
-    localStorage.setItem(CART_KEY, JSON.stringify(map));
+    if (map && typeof map === 'object') {
+      setCookie(CART_COOKIE, encodeObj(map), COOKIE_MAX_AGE);
+      localStorage.removeItem('cart_ids');
+      localStorage.removeItem('cart_map_v2');
+    }
   } catch {}
 }
-migrateOldCartFormat();
 
 function loadCartMap() {
-  try {
-    const obj = JSON.parse(localStorage.getItem(CART_KEY) || '{}');
+  const c = getCookie(CART_COOKIE);
+  if (!c) {
+    migrateFromLocalStorageIfAny();
+    const after = getCookie(CART_COOKIE);
+    if (!after) return {};
+    const obj = decodeObj(after);
     return (obj && typeof obj === 'object') ? obj : {};
-  } catch {
-    return {};
   }
+  const obj = decodeObj(c);
+  return (obj && typeof obj === 'object') ? obj : {};
 }
 function saveCartMap(map) {
-  localStorage.setItem(CART_KEY, JSON.stringify(map));
+  setCookie(CART_COOKIE, encodeObj(map || {}), COOKIE_MAX_AGE);
 }
 
 let cartMap = loadCartMap();
@@ -110,7 +74,6 @@ function normalizeImageSrc(src) {
   if (!src) return '';
   if (/^data:/i.test(src)) return src;
   if (/^(https?:)?\/\//i.test(src) || src.startsWith('https://')) return src;
-  // base64 crua
   if (/^[A-Za-z0-9+/=]+$/.test(src) && src.length > 100) return 'data:image/jpeg;base64,' + src;
   return src;
 }
@@ -186,7 +149,7 @@ function lockBodyScroll(lock) {
   }
 }
 function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, (m) => ({
+  return s.replace(/[&<>\"']/g, (m) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[m]));
 }
@@ -239,7 +202,7 @@ function injectGlobalStylesOnce() {
   /* Botões dos cards */
   .product .actions .btn.success{background:#16a34a;border-color:#16a34a;color:#fff}
 
-  /* Painel de carrinho (rodapé direito) */
+  /* Painel de carrinho */
   .cart-panel{position:fixed;right:18px;bottom:18px;z-index:9997;max-width:min(92vw,420px)}
   .cart-card{background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,.15);overflow:hidden}
   .cart-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:linear-gradient(180deg,#f8fbff,#f2f7fd)}
@@ -302,10 +265,7 @@ function addOne(id) {
   if (!id) return false;
   const stock = getStockFor(id);
   const cur = cartMap[id] || 0;
-  if (cur >= stock) {
-    showBanner('quantidade máxima em estoque atingida');
-    return false;
-  }
+  if (cur >= stock) { showBanner('quantidade máxima em estoque atingida'); return false; }
   cartMap[id] = cur + 1;
   saveCartMap(cartMap);
   syncUiAfterCartChange([id]);
@@ -347,20 +307,19 @@ function cartCount() {
    UI: Painel de Carrinho (rodapé)
 =================================== */
 const DISABLE_CART_PANEL = (window.IS_CHECKOUT === true) || /\/checkout\.(?:html?|php)(?:\?|$)/i.test(location.pathname);
-
 let __CART_ROOT = null;
 
 function ensureCartRoot() {
-    if (typeof DISABLE_CART_PANEL !== 'undefined' && DISABLE_CART_PANEL) return;
-if (__CART_ROOT) return;
+  if (typeof DISABLE_CART_PANEL !== 'undefined' && DISABLE_CART_PANEL) return;
+  if (__CART_ROOT) return;
   __CART_ROOT = document.createElement('div');
   __CART_ROOT.className = 'cart-panel';
   document.body.appendChild(__CART_ROOT);
 }
 
 function renderCartPanel() {
-    if (typeof DISABLE_CART_PANEL !== 'undefined' && DISABLE_CART_PANEL) return;
-ensureCartRoot();
+  if (typeof DISABLE_CART_PANEL !== 'undefined' && DISABLE_CART_PANEL) return;
+  ensureCartRoot();
   const ids = Object.keys(cartMap);
   if (!ids.length) {
     __CART_ROOT.innerHTML = '';
@@ -407,7 +366,6 @@ ensureCartRoot();
     </div>
   `;
 
-  // Eventos dos itens
   __CART_ROOT.querySelectorAll('.cart-item').forEach(row => {
     const id = row.getAttribute('data-id');
     row.querySelector('.ci-add')?.addEventListener('click', () => addOne(id));
@@ -417,11 +375,10 @@ ensureCartRoot();
     input?.addEventListener('change', () => setQty(id, input.value));
   });
 
-  // Limpar carrinho
   __CART_ROOT.querySelector('#cart-clear')?.addEventListener('click', () => {
     cartMap = {};
     saveCartMap(cartMap);
-    syncUiAfterCartChange(); // full sync
+    syncUiAfterCartChange();
   });
 }
 
@@ -450,10 +407,7 @@ function updateModalControls(root, id) {
   const input = root.querySelector('.pe-qty-input');
   const q = cartMap[id] || 0;
 
-  // reaproveita o visual (verde/azul) do helper padrão…
   updateBuyButton(addBtn, id);
-
-  // …mas no MODAL não exibimos a quantidade dentro do botão
   if (addBtn) {
     if (q > 0) {
       addBtn.classList.remove('primary');
@@ -465,7 +419,6 @@ function updateModalControls(root, id) {
       addBtn.innerHTML = `<i class="fa-solid fa-cart-plus"></i> Adicionar`;
     }
   }
-
   if (input) input.value = q;
 }
 
@@ -511,7 +464,7 @@ function modalTemplate(p, images) {
             ${stock !== null ? `<div class="pe-row"><dt>Estoque:</dt><dd>${stock > 0 ? `${stock} un.` : 'Indisponível'}</dd></div>` : ''}
           </dl>
 
-          ${description ? `<div class="pe-desc"><h2>Descrição</h2><p>${escapeHtml(description).replace(/\n/g, '<br>')}</p></div>` : ''}
+          ${description ? `<div class="pe-desc"><h2>Descrição</h2><p>${escapeHtml(description).replace(/\\n/g, '<br>')}</p></div>` : ''}
 
           <div class="pe-actions">
             <div class="qtybox">
@@ -539,8 +492,6 @@ function openProductModal(p) {
   
   __MODAL_ROOT.addEventListener('click', (e) => {
     const t = e.target;
-    //if (t.closest('.pe-add'))   { addOne(id); return; }
-    //if (t.closest('.pe-add1'))  { addOne(id); return; }
     if (t.closest('.pe-sub'))   { subOne(id); return; }
     if (t.closest('.pe-remall')){ removeAll(id); return; }
     if (t.closest('.pe-close') || t.closest('.pe-close-inline')) { close(); return; }
@@ -551,7 +502,6 @@ function openProductModal(p) {
   const details = __MODAL_ROOT.querySelector('.pe-details');
   const id = details?.getAttribute('data-id') || p?.id || '';
 
-  // Carrossel
   const track = __MODAL_ROOT.querySelector('.pe-track');
   const dotsWrap = __MODAL_ROOT.querySelector('.pe-dots');
   const prev = __MODAL_ROOT.querySelector('.pe-prev');
@@ -574,7 +524,6 @@ function openProductModal(p) {
   viewport.addEventListener('touchmove', e => { dx = e.touches[0].clientX - sx; }, { passive: true });
   viewport.addEventListener('touchend', () => { if (Math.abs(dx) > 40) { dx < 0 ? go(index + 1) : go(index - 1); } });
 
-  // Ações carrinho no modal
   const btnAdd = __MODAL_ROOT.querySelector('.pe-add');
   const btnAdd1 = __MODAL_ROOT.querySelector('.pe-add1');
   const btnSub1 = __MODAL_ROOT.querySelector('.pe-sub');
@@ -588,7 +537,6 @@ function openProductModal(p) {
   btnRemAll.addEventListener('click', () => removeAll(id));
   input.addEventListener('change', () => setQty(id, input.value));
 
-  // Fechar
   function close() {
     lockBodyScroll(false);
     if (overlay && overlay.parentNode) overlay.parentNode.innerHTML = '';
@@ -599,12 +547,9 @@ function openProductModal(p) {
     if (ev.key === 'Escape') { document.removeEventListener('keydown', onEsc); close(); }
   });
 
-  // Abrir e focar
   lockBodyScroll(true);
   setTimeout(() => btnClose?.focus?.(), 0);
   updateCarousel();
-
-  // Sincroniza estado inicial (caso já haja itens)
   updateModalControls(__MODAL_ROOT, id);
 }
 
@@ -648,18 +593,13 @@ function renderProducts(items, container) {
   if (!Array.isArray(items) || !container) return;
   container.innerHTML = items.map(productCard).join('');
 
-  // Botões + eventos
   container.querySelectorAll('button.buy').forEach(btn => {
     const card = btn.closest('.product');
     const id = card?.dataset?.id;
-
-    // Estado inicial (verde se já no carrinho)
     updateBuyButton(btn, id);
     btn.addEventListener('click', () => addOne(id));
-    
   });
 
-  // Abertura do modal pela imagem/card ou botão "Ver"
   function findProductFromTarget(target) {
     const card = target.closest('.product');
     if (!card) return null;
@@ -766,24 +706,18 @@ function initShowcaseCarousel(items) {
    Sync global após alterações
 =================================== */
 function syncUiAfterCartChange(idsToRefresh) {
-  // Atualiza botões dos cards
   if (Array.isArray(idsToRefresh)) idsToRefresh.forEach(updateAllGridButtonsFor);
   else {
-    // full scan
     document.querySelectorAll('.product').forEach(card => {
       const id = card.getAttribute('data-id');
       updateAllGridButtonsFor(id);
     });
   }
-
-  // Atualiza modal aberto (se houver)
   const details = document.querySelector('#product-modal-root .pe-details');
   if (details) {
     const id = details.getAttribute('data-id');
     updateModalControls(document.getElementById('product-modal-root'), id);
   }
-
-  // Atualiza painel do carrinho
   renderCartPanel();
 }
 
@@ -793,26 +727,22 @@ function syncUiAfterCartChange(idsToRefresh) {
 async function initShop() {
   injectGlobalStylesOnce();
 
-  // Produtos (cards)
   const productsGrid = document.getElementById('productsGrid') || document.querySelector('.featured .grid');
   if (productsGrid) {
     __ALL_PRODUCTS = await fetchJsonArray('https://checkout.easyreg.com.br/products.php');
     if (__ALL_PRODUCTS.length) renderProducts(__ALL_PRODUCTS, productsGrid);
   }
 
-  // Vitrine (carrossel)
   const showcaseEl = document.getElementById('showcaseTrack');
   if (showcaseEl) {
     __ALL_SHOWCASE = await fetchJsonArray('https://checkout.easyreg.com.br/showcase.php');
     if (__ALL_SHOWCASE.length) initShowcaseCarousel(__ALL_SHOWCASE);
   }
 
-  // Render inicial do painel de carrinho (caso tenha itens salvos)
   renderCartPanel();
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initShop);
 else initShop();
 
-// Global para onerror inline
 window.handleImgError = handleImgError;
