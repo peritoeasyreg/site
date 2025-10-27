@@ -1,49 +1,240 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-theme="light">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Checkout – Easy Reg</title>
   <meta name="description" content="Resumo do carrinho e finalização de compra." />
-  <link rel="icon" href="./favicon.ico" />
+  <meta name="theme-color" content="#679fad" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="rating" content="general">
+  <meta name="author" content="Easy Reg">
+  <meta name="publisher" content="easyreg.com.br">
+  <meta name="copyright" content="© 2025 Easy Reg">
+  <meta http-equiv="content-language" content="pt-BR">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Xss-Protection" content="1; mode=block">
+  <meta http-equiv="Strict-Transport-Security" content="max-age=15552000">
+  <link rel="canonical" href="https://easyreg.com.br">
+  <link rel="icon" href="assets/img/favicon.ico" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="#679fad">
+  <meta name="msapplication-TileColor" content="#679fad">
+  <link rel="apple-touch-icon" href="assets/img/logo_easyreg-apple-touch-icon-iphone-60x60.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/logo_easyreg-img/apple-touch-icon-ipad-76x76.png">
+  <link rel="apple-touch-icon" sizes="120x120"
+    href="assets/img/logo_easyreg-apple-touch-icon-iphone-retina-120x120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/img/logo_easyreg-apple-touch-icon-ipad-retina-152x152.png">
+
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="theme.css">
 
   <style>
-    main.checkout{padding:20px 0 40px}
-    .chk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 18px}
-    .chk-head h1{margin:0;font-size:22px}
-    .chk-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:transparent;color:var(--fg);padding:10px 12px;border-radius:10px;cursor:pointer;text-decoration:none}
-    .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
-    .btn[disabled]{opacity:.55;cursor:not-allowed}
-    .chk-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
-    @media (max-width:960px){.chk-grid{grid-template-columns:1fr}}
-    .chk-card{background:var(--chip-bg);color:var(--chip-fg);border:1px solid var(--border);border-radius:16px;box-shadow:var(--elev);overflow:hidden}
-    .chk-card .head,.chk-card .foot{padding:12px 14px;background:#fbfdff;border-bottom:1px solid var(--border)}
-    .chk-card .foot{border-top:1px solid var(--border);border-bottom:0}
-    .chk-row{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--border)}
-    .chk-row:first-of-type{border-top:0}
-    .chk-row img{width:64px;height:64px;object-fit:cover;border-radius:12px;background:#f3f6fb}
-    .chk-title{font:600 14px/1.25 Inter,system-ui,sans-serif;color:#0b1f3a;margin-bottom:4px}
-    .chk-meta{font:500 13px/1 Inter,sans-serif;color:#475569}
-    .qtybox{display:inline-flex;align-items:center;border:1px solid #cfe3f8;border-radius:10px;overflow:hidden}
-    .qtybox button{border:none;background:#f1f5f9;padding:8px 10px;cursor:pointer}
-    .qtybox input{width:44px;text-align:center;border:none;outline:none;padding:8px 0}
-    .chk-actions-item{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-    .btn.muted{background:#eef4fb;border-color:#dbe8f8;color:#334155}
-    .sum-card{background:var(--chip-bg);border:1px solid var(--border);border-radius:16px;box-shadow:var(--elev);padding:16px;display:grid;gap:10px;align-self:start;position:sticky;top:12px}
-    .sum-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .sum-row.total{font-weight:800;font-size:18px;border-top:1px solid var(--border);padding-top:10px;margin-top:6px}
-    .sum-actions{display:grid;gap:8px;margin-top:6px}
-    .empty{padding:18px;color:#475569}
+    main.checkout {
+      padding: 20px 0 40px
+    }
+
+    .chk-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 10px 0 18px
+    }
+
+    .chk-head h1 {
+      margin: 0;
+      font-size: 22px
+    }
+
+    .chk-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--fg);
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff
+    }
+
+    .btn[disabled] {
+      opacity: .55;
+      cursor: not-allowed
+    }
+
+    .chk-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 18px
+    }
+
+    @media (max-width:960px) {
+      .chk-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .chk-card {
+      background: var(--chip-bg);
+      color: var(--chip-fg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--elev);
+      overflow: hidden
+    }
+
+    .chk-card .head,
+    .chk-card .foot {
+      padding: 12px 14px;
+      background: #fbfdff;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .chk-card .foot {
+      border-top: 1px solid var(--border);
+      border-bottom: 0
+    }
+
+    .chk-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border)
+    }
+
+    .chk-row:first-of-type {
+      border-top: 0
+    }
+
+    .chk-row img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #f3f6fb
+    }
+
+    .chk-title {
+      font: 600 14px/1.25 Inter, system-ui, sans-serif;
+      color: #0b1f3a;
+      margin-bottom: 4px
+    }
+
+    .chk-meta {
+      font: 500 13px/1 Inter, sans-serif;
+      color: #475569
+    }
+
+    .qtybox {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #cfe3f8;
+      border-radius: 10px;
+      overflow: hidden
+    }
+
+    .qtybox button {
+      border: none;
+      background: #f1f5f9;
+      padding: 8px 10px;
+      cursor: pointer
+    }
+
+    .qtybox input {
+      width: 44px;
+      text-align: center;
+      border: none;
+      outline: none;
+      padding: 8px 0
+    }
+
+    .chk-actions-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end
+    }
+
+    .btn.muted {
+      background: #eef4fb;
+      border-color: #dbe8f8;
+      color: #334155
+    }
+
+    .sum-card {
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--elev);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      align-self: start;
+      position: sticky;
+      top: 12px
+    }
+
+    .sum-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px
+    }
+
+    .sum-row.total {
+      font-weight: 800;
+      font-size: 18px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      margin-top: 6px
+    }
+
+    .sum-actions {
+      display: grid;
+      gap: 8px;
+      margin-top: 6px
+    }
+
+    .empty {
+      padding: 18px;
+      color: #475569
+    }
+
     /* placeholders para acionar o fetch do shop.js */
-    ._hidden-fetchers{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden}
+    ._hidden-fetchers {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden
+    }
   </style>
 </head>
+
 <body>
   <!-- Header -->
   <header class="site-header centauro-like">
@@ -66,7 +257,8 @@
       <h1>Seu carrinho</h1>
       <div class="chk-actions">
         <a class="btn" href="index.html"><i class="fa-solid fa-arrow-left"></i> Voltar para a loja</a>
-        <a class="btn primary" id="finalizarTop" href="https://easyreg.smartzeus.com.br/buy.php"><i class="fa-solid fa-credit-card"></i> Finalizar compra</a>
+        <a class="btn primary" id="finalizarTop" href="https://easyreg.smartzeus.com.br/buy.php"><i
+            class="fa-solid fa-credit-card"></i> Finalizar compra</a>
       </div>
     </div>
 
@@ -77,7 +269,8 @@
         <div id="items" class="chk-items"></div>
         <div class="foot">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-            <button class="btn muted" id="limparCarrinho"><i class="fa-regular fa-trash-can"></i> Limpar carrinho</button>
+            <button class="btn muted" id="limparCarrinho"><i class="fa-regular fa-trash-can"></i> Limpar
+              carrinho</button>
             <div id="totalLinha" style="font-weight:800;">Total: R$ 0,00</div>
           </div>
         </div>
@@ -99,7 +292,8 @@
         </div>
         <div class="sum-actions">
           <a class="btn" href="index.html"><i class="fa-solid fa-arrow-left"></i> Continuar comprando</a>
-          <a class="btn primary" id="finalizarBtn" href="https://easyreg.smartzeus.com.br/buy.php"><i class="fa-solid fa-lock"></i> Finalizar compra</a>
+          <a class="btn primary" id="finalizarBtn" href="https://easyreg.smartzeus.com.br/buy.php"><i
+              class="fa-solid fa-lock"></i> Finalizar compra</a>
         </div>
       </aside>
     </div>
@@ -125,48 +319,48 @@
 
   <!-- shop.js deve vir antes do nosso script -->
   <script src="/assets/js/shop.js"></script>
-  
+
 
   <script>
-  document.getElementById('year')?.appendChild(document.createTextNode(new Date().getFullYear()));
+    document.getElementById('year')?.appendChild(document.createTextNode(new Date().getFullYear()));
 
-  const elItems = document.getElementById('items');
-  const elSubtotal = document.getElementById('subtotalTxt');
-  const elTotal = document.getElementById('totalTxt');
-  const elTotalLinha = document.getElementById('totalLinha');
-  const btnLimpar = document.getElementById('limparCarrinho');
-  const btnFinalizar = document.getElementById('finalizarBtn');
-  const btnFinalizarTop = document.getElementById('finalizarTop');
+    const elItems = document.getElementById('items');
+    const elSubtotal = document.getElementById('subtotalTxt');
+    const elTotal = document.getElementById('totalTxt');
+    const elTotalLinha = document.getElementById('totalLinha');
+    const btnLimpar = document.getElementById('limparCarrinho');
+    const btnFinalizar = document.getElementById('finalizarBtn');
+    const btnFinalizarTop = document.getElementById('finalizarTop');
 
-  function toggleFinalizarButtons(enabled) {
-    [btnFinalizar, btnFinalizarTop].forEach(btn => {
-      if (!btn) return;
-      btn.disabled = !enabled;
-      btn.style.pointerEvents = enabled ? 'auto' : 'none';
-      btn.style.opacity = enabled ? '1' : '0.5';
-      btn.title = enabled ? 'Ir para o pagamento' : 'Carrinho vazio';
-    });
-  }
+    function toggleFinalizarButtons(enabled) {
+      [btnFinalizar, btnFinalizarTop].forEach(btn => {
+        if (!btn) return;
+        btn.disabled = !enabled;
+        btn.style.pointerEvents = enabled ? 'auto' : 'none';
+        btn.style.opacity = enabled ? '1' : '0.5';
+        btn.title = enabled ? 'Ir para o pagamento' : 'Carrinho vazio';
+      });
+    }
 
-  function renderCheckout() {
-    const map = (window.cartMap && window.cartMap()) || {};
-    const ids = Object.keys(map);
-    const isEmpty = ids.length === 0;
-    toggleFinalizarButtons(!isEmpty);
+    function renderCheckout() {
+      const map = (window.cartMap && window.cartMap()) || {};
+      const ids = Object.keys(map);
+      const isEmpty = ids.length === 0;
+      toggleFinalizarButtons(!isEmpty);
 
-    if (isEmpty) {
-      elItems.innerHTML = '<div class="empty">Seu carrinho está vazio. <a href="index.html" class="btn" style="margin-left:6px;"><i class="fa-solid fa-arrow-left"></i> Voltar para a loja</a></div>';
-    } else {
-      const rows = ids.map(id => {
-        const hasProductsLoaded = (typeof findProductById === 'function') && !!findProductById(id);
-        const title = hasProductsLoaded && (typeof getTitleFor === 'function') ? getTitleFor(id) : `Item ${id}`;
-        const img = hasProductsLoaded && (typeof getCoverFor === 'function') ? getCoverFor(id) : '';
-        const price = hasProductsLoaded && (typeof getPriceFor === 'function') ? getPriceFor(id) : 0;
-        const qty = map[id] || 0;
-        const subtotal = (typeof BRL !== 'undefined') ? BRL.format(price * qty) : (price * qty).toFixed(2);
-        const priceTxt = hasProductsLoaded ? ((typeof BRL !== 'undefined') ? BRL.format(price) : price) : 'carregando…';
+      if (isEmpty) {
+        elItems.innerHTML = '<div class="empty">Seu carrinho está vazio. <a href="index.html" class="btn" style="margin-left:6px;"><i class="fa-solid fa-arrow-left"></i> Voltar para a loja</a></div>';
+      } else {
+        const rows = ids.map(id => {
+          const hasProductsLoaded = (typeof findProductById === 'function') && !!findProductById(id);
+          const title = hasProductsLoaded && (typeof getTitleFor === 'function') ? getTitleFor(id) : `Item ${id}`;
+          const img = hasProductsLoaded && (typeof getCoverFor === 'function') ? getCoverFor(id) : '';
+          const price = hasProductsLoaded && (typeof getPriceFor === 'function') ? getPriceFor(id) : 0;
+          const qty = map[id] || 0;
+          const subtotal = (typeof BRL !== 'undefined') ? BRL.format(price * qty) : (price * qty).toFixed(2);
+          const priceTxt = hasProductsLoaded ? ((typeof BRL !== 'undefined') ? BRL.format(price) : price) : 'carregando…';
 
-        return `
+          return `
           <div class="chk-row" data-id="${id}">
             <img src="${img || ''}" alt="">
             <div>
@@ -183,66 +377,67 @@
             </div>
           </div>
         `;
-      }).join('');
-      elItems.innerHTML = rows;
+        }).join('');
+        elItems.innerHTML = rows;
+      }
+
+      const totalVal = (typeof cartTotal === 'function') ? cartTotal() : 0;
+      const totalStr = (typeof BRL !== 'undefined') ? BRL.format(totalVal) : totalVal.toFixed(2);
+      elSubtotal.textContent = totalStr;
+      elTotal.textContent = totalStr;
+      elTotalLinha.textContent = 'Total: ' + totalStr;
+
+      elItems.querySelectorAll('.chk-row').forEach(row => {
+        const id = row.getAttribute('data-id');
+        const btnAdd = row.querySelector('.ci-add');
+        const btnSub = row.querySelector('.ci-sub');
+        const btnRem = row.querySelector('.ci-rem');
+        const input = row.querySelector('.ci-input');
+
+        btnAdd?.addEventListener('click', () => { addOne(id, getStockFor(id)); renderCheckout(); });
+        btnSub?.addEventListener('click', () => { subOne(id); renderCheckout(); });
+        btnRem?.addEventListener('click', () => { removeAll(id); renderCheckout(); });
+        input?.addEventListener('change', () => { setQty(id, input.value); renderCheckout(); });
+      });
     }
 
-    const totalVal = (typeof cartTotal === 'function') ? cartTotal() : 0;
-    const totalStr = (typeof BRL !== 'undefined') ? BRL.format(totalVal) : totalVal.toFixed(2);
-    elSubtotal.textContent = totalStr;
-    elTotal.textContent = totalStr;
-    elTotalLinha.textContent = 'Total: ' + totalStr;
-
-    elItems.querySelectorAll('.chk-row').forEach(row => {
-      const id = row.getAttribute('data-id');
-      const btnAdd = row.querySelector('.ci-add');
-      const btnSub = row.querySelector('.ci-sub');
-      const btnRem = row.querySelector('.ci-rem');
-      const input = row.querySelector('.ci-input');
-
-      btnAdd?.addEventListener('click', () => { addOne(id, getStockFor(id)); renderCheckout(); });
-      btnSub?.addEventListener('click', () => { subOne(id); renderCheckout(); });
-      btnRem?.addEventListener('click', () => { removeAll(id); renderCheckout(); });
-      input?.addEventListener('change', () => { setQty(id, input.value); renderCheckout(); });
+    btnLimpar?.addEventListener('click', () => {
+      const map = (window.cartMap && window.cartMap()) || {};
+      Object.keys(map).forEach(id => { removeAll(id); });
+      renderCheckout();
     });
-  }
 
-  btnLimpar?.addEventListener('click', () => {
-    const map = (window.cartMap && window.cartMap()) || {};
-    Object.keys(map).forEach(id => { removeAll(id); });
-    renderCheckout();
-  });
-
-  async function ensureProductsLoaded() {
-    if (typeof findProductById === 'function') {
-      const map = window.cartMap ? window.cartMap() : {};
-      const ids = Object.keys(map);
-      if (!ids.length) return;
-      for (let i = 0; i < 10; i++) {
-        const allOk = ids.every(id => findProductById(id));
-        if (allOk) return;
-        await new Promise(r => setTimeout(r, 150));
+    async function ensureProductsLoaded() {
+      if (typeof findProductById === 'function') {
+        const map = window.cartMap ? window.cartMap() : {};
+        const ids = Object.keys(map);
+        if (!ids.length) return;
+        for (let i = 0; i < 10; i++) {
+          const allOk = ids.every(id => findProductById(id));
+          if (allOk) return;
+          await new Promise(r => setTimeout(r, 150));
+        }
       }
     }
-  }
 
-  window.addEventListener('storage', (e) => {
-    if (e.key && e.key.includes('cart_map')) renderCheckout();
-  });
+    window.addEventListener('storage', (e) => {
+      if (e.key && e.key.includes('cart_map')) renderCheckout();
+    });
 
-  async function start() {
-    renderCheckout();
-    await ensureProductsLoaded();
-    renderCheckout();
-    document.addEventListener('click', () => setTimeout(renderCheckout, 50));
-  }
+    async function start() {
+      renderCheckout();
+      await ensureProductsLoaded();
+      renderCheckout();
+      document.addEventListener('click', () => setTimeout(renderCheckout, 50));
+    }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
-  }
-</script>
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+  </script>
 
 </body>
+
 </html>
