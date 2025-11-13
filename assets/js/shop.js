@@ -323,7 +323,7 @@ function cartCount() {
 /* ===================================
    UI: Painel de Carrinho (rodapé)
 =================================== */
-const DISABLE_CART_PANEL = (window.IS_CHECKOUT === true) || /\/checkout\.(?:html?|php)(?:\?|$)/i.test(location.pathname);
+const DISABLE_CART_PANEL = (window.IS_CHECKOUT === true) || /\/checkout$)/i.test(location.pathname);
 let __CART_ROOT = null;
 
 function ensureCartRoot() {
@@ -766,14 +766,14 @@ async function initShop() {
   // Produtos (cards) — ajuste os endpoints se necessário
   const productsGrid = document.getElementById('productsGrid') || document.querySelector('.featured .grid');
   if (productsGrid) {
-    __ALL_PRODUCTS = await fetchJsonArray('https://checkout.easyreg.com.br/products.php');
+    __ALL_PRODUCTS = await fetchJsonArray('https://checkout.easyreg.com.br/products');
     if (__ALL_PRODUCTS.length) renderProducts(__ALL_PRODUCTS, productsGrid);
   }
 
   // Vitrine (carrossel)
   const showcaseEl = document.getElementById('showcaseTrack');
   if (showcaseEl) {
-    __ALL_SHOWCASE = await fetchJsonArray('https://checkout.easyreg.com.br/showcase.php');
+    __ALL_SHOWCASE = await fetchJsonArray('https://checkout.easyreg.com.br/showcase');
     if (__ALL_SHOWCASE.length) initShowcaseCarousel(__ALL_SHOWCASE);
   }
 
