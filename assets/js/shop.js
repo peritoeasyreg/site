@@ -323,7 +323,7 @@ function cartCount() {
 /* ===================================
    UI: Painel de Carrinho (rodapé)
 =================================== */
-const DISABLE_CART_PANEL = (window.IS_CHECKOUT === true) || /\/checkout$)/i.test(location.pathname);
+const DISABLE_CART_PANEL = (window.IS_CHECKOUT === true) || /\/checkout$/i.test(location.pathname);
 let __CART_ROOT = null;
 
 function ensureCartRoot() {
